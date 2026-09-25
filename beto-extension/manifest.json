@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Beto para Moodle UNEMI",
-  "version": "1.6.0",
-  "description": "Asistente Beto para Capacitación Docente UNEMI.",
+  "version": "1.7.0",
+  "description": "Asistente Beto para Moodle UNEMI: chat académico, documentos, videos y presentaciones.",
   "content_scripts": [
     {
       "matches": [

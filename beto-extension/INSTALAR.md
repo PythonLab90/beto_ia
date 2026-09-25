@@ -13,6 +13,12 @@ Esta extensión es para una prueba local. No modifica el código de Moodle: agre
 
 Aparecerá el botón azul `B` abajo a la derecha. Haz clic para abrir el asistente. Puedes arrastrar la barra azul superior para moverlo y la esquina inferior derecha para cambiar su tamaño.
 
+## Crear una presentación
+
+Abre Beto desde Moodle y solicita una presentación indicando el tema. Beto puede generar las diapositivas, buscar imágenes en Internet relacionadas con cada tema, mostrar la vista previa y exportar la presentación a PDF o PowerPoint.
+
+Ejemplo: `Crea una presentación de 8 diapositivas sobre redes neuronales artificiales, con contenido académico, imágenes específicas por diapositiva y referencias.`
+
 ## Resumir un video privado de Moodle
 
 1. Inicia sesión normalmente en Moodle con tu correo institucional.
