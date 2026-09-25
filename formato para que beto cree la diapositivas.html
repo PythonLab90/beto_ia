@@ -1,0 +1,408 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mejora del trabajo colaborativo y la IA - UNEMI</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+:root{
+  --navy:#0a2345;
+  --navy-2:#123a60;
+  --blue:#0a5cb3;
+  --blue-2:#3c8dff;
+  --orange:#f5822a;
+  --orange-2:#ffb16f;
+  --pink:#ff7bbf;
+  --purple:#7b61ff;
+  --cyan:#57d2ff;
+  --green:#31c48d;
+  --light:#f5f7fc;
+  --text:#1d2c44;
+  --muted:#5d728d;
+  --white:#fff;
+  --shadow:0 20px 50px rgba(10,35,69,.12);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:'Poppins',Arial,sans-serif;background:linear-gradient(135deg,#ebf3ff,#fdf5ef,#eefaf7);color:var(--text);overflow:hidden}
+.presentation{width:100vw;height:100vh;position:relative;background:linear-gradient(140deg,#f9fbff 0%,#edf3ff 28%,#fffaf5 58%,#f6fbff 100%)}
+.slide{position:absolute;inset:0;padding:48px 7vw 38px;display:none;background:
+ radial-gradient(circle at 12% 12%,rgba(87,210,255,.20),transparent 18%),
+ radial-gradient(circle at 88% 14%,rgba(255,123,191,.12),transparent 16%),
+ radial-gradient(circle at 72% 78%,rgba(123,97,255,.12),transparent 20%),
+ linear-gradient(135deg,#ffffff 0%,#f7f9fe 46%,#eef6ff 100%)}
+.slide::before{
+  content:"";
+  position:absolute;
+  inset:20px 26px auto auto;
+  width:180px;
+  height:180px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(245,130,42,.18),transparent 65%);
+  filter:blur(6px);
+  pointer-events:none;
+}
+.slide.active{display:block}
+.slide.has-topic-photo{padding-right:30vw}
+.topic-photo{position:absolute;right:7vw;top:24%;width:22vw;max-width:270px;height:220px;object-fit:cover;border:8px solid rgba(255,255,255,.92);border-radius:6px;box-shadow:0 18px 34px rgba(16,42,67,.18);transform:rotate(2deg)}
+.topline{height:8px;background:linear-gradient(90deg,var(--navy) 0 30%,var(--blue-2) 30% 55%,var(--orange) 55% 78%,var(--pink) 78% 100%);position:absolute;top:0;left:0;right:0;box-shadow:0 6px 18px rgba(10,35,69,.12)}
+.brand{font-size:15px;font-weight:800;color:var(--blue);letter-spacing:.7px;margin-top:2px;text-transform:uppercase}
+.brand span{color:var(--orange)}
+h1{font-family:'Montserrat',sans-serif;font-size:54px;line-height:1.04;margin:26px 0 14px;color:var(--navy);letter-spacing:-1.8px;font-weight:900}
+h1 .orange{color:var(--orange)}
+h2{font-family:'Montserrat',sans-serif;font-size:38px;margin:8px 0 25px;color:var(--navy);letter-spacing:-1px;font-weight:800}
+h3{font-size:22px;color:var(--navy);margin:0 0 9px;font-weight:800}
+p{font-size:19px;line-height:1.55;margin:0 0 14px}
+.subtitle{font-size:22px;color:var(--muted);max-width:900px;font-weight:500}
+.badge{display:inline-block;background:linear-gradient(135deg,var(--navy),var(--blue-2),var(--purple));color:#fff;border-radius:30px;padding:12px 24px;font-weight:700;margin-top:18px;box-shadow:0 12px 22px rgba(59,105,255,.20)}
+.orange-line{width:120px;height:6px;background:linear-gradient(90deg,var(--orange),var(--pink),var(--cyan));margin:16px 0 22px;border-radius:10px;box-shadow:0 6px 18px rgba(245,130,42,.28)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:linear-gradient(180deg,#fff,#f9fbff);border:1px solid rgba(11,92,179,.08);border-radius:22px;padding:22px;box-shadow:0 18px 40px rgba(20,61,120,.08);position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;inset:0 auto auto 0;width:100%;height:4px;background:linear-gradient(90deg,var(--blue-2),var(--orange),var(--pink));}
+.card strong{color:var(--navy)}
+.card .num{font-family:'Montserrat',sans-serif;font-size:30px;font-weight:900;color:var(--orange);margin-bottom:8px}
+.quote{border-left:6px solid var(--orange);padding:16px 20px;background:linear-gradient(135deg,#fffaf5,#eef7ff);border-radius:0 18px 18px 0;font-size:21px;line-height:1.45;box-shadow:0 12px 24px rgba(10,35,69,.06)}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 18px 34px rgba(10,35,69,.08)}
+th{background:linear-gradient(135deg,var(--navy),var(--navy-2));color:#fff;text-align:left;padding:16px;font-size:16px;font-weight:700}
+td{padding:14px 14px;border-bottom:1px solid rgba(10,35,69,.08);font-size:16px;vertical-align:top;background:rgba(255,255,255,.85)}
+tr:last-child td{border-bottom:0}
+.pill{display:inline-block;padding:6px 12px;border-radius:20px;background:linear-gradient(135deg,#fff0e6,#fff6ef);color:#ba5a16;font-weight:700;font-size:13px;box-shadow:inset 0 0 0 1px rgba(245,130,42,.14)}
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:50px;align-items:center;height:100%}
+.heroBox{padding:42px;border-radius:30px;background:linear-gradient(135deg,#ffffff 0%,#edf5ff 42%,#fff9f2 100%);box-shadow:0 24px 60px rgba(11,57,118,.14);border:1px solid rgba(18,58,96,.08);transform:translateY(-2px)}
+.circle{width:270px;height:270px;border-radius:50%;margin:auto;background:radial-gradient(circle at 35% 30%,#ffffff 0%,#edf4ff 35%,#dfeeff 100%);border:14px solid rgba(10,92,179,.12);display:flex;align-items:center;justify-content:center;color:var(--navy);font-size:78px;font-weight:900;box-shadow:inset 0 0 0 8px rgba(255,255,255,.7),0 26px 35px rgba(87,210,255,.16)}
+.visual-stack{display:grid;gap:14px}
+.photo-card{background:#fff;border:1px solid rgba(10,35,69,.08);border-radius:24px;overflow:hidden;box-shadow:0 16px 28px rgba(10,35,69,.10)}
+.photo-card img{display:block;width:100%;height:200px;object-fit:cover}
+.photo-card .caption{padding:12px 14px 16px;font-weight:700;color:var(--navy);font-size:14px}
+.image-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.mini-photos{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+.mini-photo{position:relative;border-radius:18px;overflow:hidden;height:170px;border:1px solid rgba(10,35,69,.08);box-shadow:0 14px 26px rgba(10,35,69,.08)}
+.mini-photo img{width:100%;height:100%;object-fit:cover}
+.mini-photo span{position:absolute;left:12px;bottom:12px;background:linear-gradient(135deg,rgba(10,35,69,.88),rgba(10,92,179,.8));color:#fff;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:700}
+.feature-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
+.feature-pill{background:linear-gradient(180deg,#fff,#f4f9ff);border:1px solid rgba(10,92,179,.08);border-radius:16px;padding:16px 12px;text-align:center;color:var(--navy);font-weight:700;font-size:13px;box-shadow:0 12px 22px rgba(10,35,69,.05);transition:transform .2s ease}
+.feature-pill:hover{transform:translateY(-2px)}
+.feature-pill .icon{display:block;font-size:24px;margin-bottom:8px;color:var(--orange)}
+.bigNumber{font-family:'Montserrat',sans-serif;font-size:76px;color:var(--orange);font-weight:900;line-height:1}
+ul{margin:8px 0 0;padding-left:23px}
+li{font-size:18px;line-height:1.5;margin:9px 0}
+.footer{position:absolute;bottom:16px;left:7vw;right:7vw;display:flex;justify-content:space-between;color:#7d8ca0;font-size:12px;font-weight:600}
+.controls{position:fixed;right:22px;bottom:18px;z-index:10;display:flex;gap:8px}
+button{border:0;background:linear-gradient(135deg,var(--navy),var(--blue-2),var(--purple));color:#fff;width:44px;height:44px;border-radius:50%;font-size:20px;cursor:pointer;box-shadow:0 12px 20px rgba(59,105,255,.25);transition:transform .2s ease, box-shadow .2s ease}
+button:hover{background:linear-gradient(135deg,var(--orange),var(--pink),var(--purple));transform:translateY(-1px) scale(1.03);box-shadow:0 12px 20px rgba(245,130,42,.28)}
+.progress{position:fixed;left:0;bottom:0;height:5px;background:linear-gradient(90deg,var(--purple),var(--blue-2),var(--orange),var(--pink));width:0;z-index:20;transition:.25s;border-radius:0 8px 0 0;box-shadow:0 0 16px rgba(123,97,255,.45)}
+.note{font-size:13px;color:#77849a;margin-top:15px}
+@media(max-width:900px){
+  body{overflow:auto}
+  .presentation{height:auto;min-height:100vh}
+  .slide{position:relative;height:auto;min-height:100vh;padding:38px 18px 70px}
+  .slide.has-topic-photo{padding-right:18px}
+  .topic-photo{position:relative;right:auto;top:auto;width:100%;max-width:none;height:190px;margin:20px 0 0;transform:none}
+  h1{font-size:40px}
+  h2{font-size:30px}
+  p,li{font-size:16px}
+  .grid3,.grid2,.hero,.feature-strip,.image-grid{grid-template-columns:1fr}
+  .mini-photos{grid-template-columns:1fr}
+  .footer{left:18px;right:18px;bottom:12px}
+}
+</style>
+</head>
+<body>
+<div class="presentation">
+
+<section class="slide active">
+ <div class="topline"></div>
+ <div class="hero">
+  <div>
+   <div class="brand">UNIVERSIDAD ESTATAL DE MILAGRO <span>• PRESENTACIÓN</span></div>
+   <h1>Reuniones académicas:<br><span class="orange">trabajo colaborativo</span> e IA</h1>
+   <div class="orange-line"></div>
+   <p class="subtitle">Síntesis de los principales hallazgos, problemas, propuestas y próximos pasos identificados en dos documentos de reunión académica.</p>
+   <span class="badge">Asistente Académico Beto</span>
+  </div>
+  <div class="heroBox">
+   <div class="visual-stack">
+    <div class="photo-card">
+     <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=900&q=80" alt="Estudiantes colaborando en equipo">
+     <div class="caption">Trabajo en equipo y aprendizaje compartido</div>
+    </div>
+    <div class="mini-photos">
+     <div class="mini-photo">
+      <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=700&q=80" alt="Técnicas de estudio">
+      <span>IA</span>
+     </div>
+     <div class="mini-photo">
+      <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=700&q=80" alt="Reunión académica">
+      <span>Grupo</span>
+     </div>
+    </div>
+   </div>
+   <p style="text-align:center;margin-top:22px;font-weight:700;color:var(--navy)">Participación • Roles • Seguimiento</p>
+   <p style="text-align:center;color:var(--muted)">Metodología · colaboración · aprendizaje</p>
+  </div>
+ </div>
+ <div class="footer"><span>Presentación basada en los documentos proporcionados</span><span>01</span></div>
+</section>
+
+<section class="slide has-topic-photo">
+ <div class="topline"></div>
+ <div class="brand">UNIVERSIDAD ESTATAL DE MILAGRO <span>• CONTEXTO</span></div>
+ <h2>1. ¿Qué se revisó en las reuniones?</h2>
+ <img class="topic-photo" src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=900&q=85" alt="Estudiantes colaborando en una actividad académica">
+ <div class="grid2">
+  <div class="card">
+   <div class="num">01</div>
+   <h3>Actividades de aprendizaje colaborativo</h3>
+   <p>Se revisó la implementación de actividades colaborativas, con énfasis en la integración de herramientas de <strong>inteligencia artificial</strong> y en el diseño de tareas que promuevan participación activa.</p>
+  </div>
+  <div class="card">
+   <div class="num">02</div>
+   <h3>Dinámica del trabajo grupal</h3>
+   <p>Se analizó la forma en que se organizan los grupos, la definición de roles, la metodología de formación y la necesidad de alinear las expectativas de los estudiantes con los objetivos académicos.</p>
+  </div>
+ </div>
+ <div class="quote" style="margin-top:24px">La idea central que aparece en ambos documentos es mejorar la estructura del trabajo en equipo para que la participación se traduzca en aprendizaje y resultados verificables.</div>
+ <div class="footer"><span>Contexto general</span><span>02</span></div>
+</section>
+
+<section class="slide has-topic-photo">
+ <div class="topline"></div>
+ <div class="brand">REUNIÓN 1 <span>• HALLAZGOS</span></div>
+ <h2>2. Principales hallazgos de la primera reunión</h2>
+ <img class="topic-photo" src="https://images.unsplash.com/photo-1535378917042-10a22c95931a?auto=format&fit=crop&w=900&q=85" alt="Tecnología utilizada para analizar información">
+ <table>
+  <tr><th>Hallazgo</th><th>Observación</th><th>Impacto señalado</th></tr>
+  <tr><td><strong>Participación</strong></td><td>Se menciona una participación alta en la entrega de actividades.</td><td>Participar no garantiza por sí solo calidad ni colaboración real.</td></tr>
+  <tr><td><strong>Conflictos internos</strong></td><td>Se reportan desacuerdos y cambios de grupo.</td><td>Puede producir desorganización y afectar el rendimiento colectivo.</td></tr>
+  <tr><td><strong>Instrucciones poco claras</strong></td><td>Se plantea la necesidad de instrucciones y guías.</td><td>Puede generar tareas desordenadas y entregas incoherentes.</td></tr>
+  <tr><td><strong>Uso de IA</strong></td><td>Algunos estudiantes utilizan IA para generar contenido sin supervisión.</td><td>Existe riesgo de plagio, trabajo no original y dependencia tecnológica.</td></tr>
+  <tr><td><strong>Colaboración real</strong></td><td>Se señala que la entrega individual no siempre demuestra trabajo en equipo.</td><td>Se requiere un esquema de roles y seguimiento.</td></tr>
+ </table>
+ <div class="footer"><span>Hallazgos y efectos descritos en el documento</span><span>03</span></div>
+</section>
+
+<section class="slide has-topic-photo">
+ <div class="topline"></div>
+ <div class="brand">REUNIÓN 1 <span>• PROPUESTAS</span></div>
+ <h2>3. Propuestas para mejorar la colaboración</h2>
+ <img class="topic-photo" src="https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=900&q=85" alt="Equipo académico organizando un proyecto">
+ <div class="grid3">
+  <div class="card"><div class="num">01</div><h3>Roles específicos</h3><p>Asignar funciones como <strong>líder, investigador, escritor, editor y verificador</strong> para identificar el aporte de cada integrante.</p></div>
+  <div class="card"><div class="num">02</div><h3>Supervisión de IA</h3><p>Crear un marco de supervisión donde el docente revise la integración y el proceso de generación con IA.</p></div>
+  <div class="card"><div class="num">03</div><h3>Mediación docente</h3><p>Incorporar dinámicas de formación de equipos y mediación para prevenir confrontaciones y fomentar respeto.</p></div>
+  <div class="card"><div class="num">04</div><h3>Recursos de calidad</h3><p>Proporcionar bases de datos, ejemplos de proyectos y guías metodológicas para apoyar el aprendizaje.</p></div>
+  <div class="card"><div class="num">05</div><h3>Evaluación y seguimiento</h3><p>Evaluar participación, calidad de entregables y uso de IA, con entregas parciales y retroalimentación.</p></div>
+  <div class="card"><div class="num">06</div><h3>Entornos prácticos</h3><p>Favorecer actividades que permitan experimentar, validar hallazgos y aplicar lo aprendido en situaciones reales.</p></div>
+ </div>
+ <div class="footer"><span>Propuestas de mejora</span><span>04</span></div>
+</section>
+
+<section class="slide has-topic-photo">
+ <div class="topline"></div>
+ <div class="brand">REUNIÓN 2 <span>• DINÁMICA GRUPAL</span></div>
+ <h2>4. Situación del trabajo grupal</h2>
+ <img class="topic-photo" src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=900&q=85" alt="Reunión de trabajo con colaboración grupal">
+ <div class="grid3">
+  <div class="card"><div class="num">01</div><h3>Participación activa</h3><p>Los estudiantes expresan interés por conocer y desarrollar sus capacidades.</p><span class="pill">Potencial de compromiso</span></div>
+  <div class="card"><div class="num">02</div><h3>Claridad metodológica</h3><p>Se observa que el trabajo grupal actual puede no estar suficientemente estructurado.</p><span class="pill">Riesgo de ineficiencia</span></div>
+  <div class="card"><div class="num">03</div><h3>Expectativas vs. resultados</h3><p>Se plantea una desconexión entre lo que esperan los estudiantes y los resultados académicos.</p><span class="pill">Riesgo de desmotivación</span></div>
+ </div>
+ <div class="quote" style="margin-top:25px">Puntos críticos: falta de una guía clara para formar grupos y asignar tareas; necesidad de definir roles y responsabilidades.</div>
+ <div class="footer"><span>Situación identificada en la segunda reunión</span><span>05</span></div>
+</section>
+
+<section class="slide has-topic-photo">
+ <div class="topline"></div>
+ <div class="brand">REUNIÓN 2 <span>• DECISIONES Y TAREAS</span></div>
+ <h2>5. ¿Qué se propone hacer?</h2>
+ <img class="topic-photo" src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=900&q=85" alt="Planificación de tareas y próximos pasos">
+ <div class="grid2">
+  <div class="card">
+   <h3>Decisiones planteadas</h3>
+   <ul>
+    <li>Revisar la metodología de formación de grupos.</li>
+    <li>Definir roles claros dentro de los grupos.</li>
+    <li>Mantener al docente como facilitador con visión académica.</li>
+   </ul>
+  </div>
+  <div class="card">
+   <h3>Tareas y compromisos</h3>
+   <ul>
+    <li>Elaborar una propuesta de nuevo esquema de formación de grupos.</li>
+    <li>Diseñar roles y responsabilidades para cada miembro.</li>
+    <li>Definir indicadores de aprendizaje alineados con las expectativas estudiantiles.</li>
+   </ul>
+  </div>
+ </div>
+ <div class="feature-strip">
+  <div class="feature-pill"><span class="icon">👥</span>Grupos</div>
+  <div class="feature-pill"><span class="icon">🧠</span>IA</div>
+  <div class="feature-pill"><span class="icon">📊</span>Indicadores</div>
+  <div class="feature-pill"><span class="icon">✅</span>Seguimiento</div>
+ </div>
+ <div class="card" style="margin-top:22px">
+  <h3>Riesgos y oportunidades</h3>
+  <div class="grid2">
+   <p><strong>Riesgos:</strong> desorganización, bajo rendimiento, desmotivación y dificultad para medir el progreso.</p>
+   <p><strong>Oportunidades:</strong> guía estructurada para grupos, actividades prácticas y métricas específicas de aprendizaje.</p>
+  </div>
+ </div>
+ <div class="footer"><span>Decisiones, tareas y oportunidades</span><span>06</span></div>
+</section>
+
+<section class="slide has-topic-photo">
+ <div class="topline"></div>
+ <div class="brand">PLAN DE ACCIÓN <span>• SEGUIMIENTO</span></div>
+ <h2>6. Próximos pasos</h2>
+ <img class="topic-photo" src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=900&q=85" alt="Plan de acción organizado en un espacio de trabajo">
+ <div class="grid2">
+  <div class="card">
+   <div class="bigNumber">01</div>
+   <h3>Revisar y documentar</h3>
+   <p>Revisar y documentar la metodología actual de formación de grupos.</p>
+  </div>
+  <div class="card">
+   <div class="bigNumber">02</div>
+   <h3>Crear una plantilla</h3>
+   <p>Desarrollar una plantilla con roles y responsabilidades claros para los integrantes.</p>
+  </div>
+  <div class="card">
+   <div class="bigNumber">03</div>
+   <h3>Definir indicadores</h3>
+   <p>Establecer indicadores de aprendizaje que conecten objetivos académicos con expectativas estudiantiles.</p>
+  </div>
+  <div class="card">
+   <div class="bigNumber">04</div>
+   <h3>Programar seguimiento</h3>
+   <p>Planificar reuniones de seguimiento para revisar avances de las tareas propuestas.</p>
+  </div>
+ </div>
+ <div class="footer"><span>Próximos pasos documentados</span><span>07</span></div>
+</section>
+
+<section class="slide has-topic-photo">
+ <div class="topline"></div>
+ <div class="brand">INDICADORES <span>• MEDICIÓN</span></div>
+ <h2>7. Indicadores sugeridos</h2>
+ <img class="topic-photo" src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=900&q=85" alt="Gráficos de análisis de indicadores">
+ <table>
+  <tr><th>Métrica</th><th>Objetivo</th><th>Fuente de datos</th></tr>
+  <tr><td>% de grupos con roles definidos</td><td><strong>90%</strong></td><td>Registro docente</td></tr>
+  <tr><td>Índice de satisfacción estudiantil con el trabajo grupal</td><td><strong>≥ 80%</strong></td><td>Encuesta semestral</td></tr>
+  <tr><td>Tiempo medio de finalización de proyectos grupales</td><td><strong>≤ 2 semanas</strong></td><td>Cronograma del curso</td></tr>
+  <tr><td>% de tareas entregadas a tiempo</td><td><strong>≥ 95%</strong></td><td>Sistema LMS</td></tr>
+ </table>
+ <div class="quote" style="margin-top:25px">El seguimiento permite pasar de una propuesta general de mejora a una revisión basada en evidencias.</div>
+ <div class="footer"><span>Indicadores extraídos del documento de seguimiento</span><span>08</span></div>
+</section>
+
+<section class="slide has-topic-photo">
+ <div class="topline"></div>
+ <div class="brand">PLAN DE SEGUIMIENTO <span>• 24 HORAS / 7 DÍAS / 30 DÍAS</span></div>
+ <h2>8. Seguimiento propuesto</h2>
+ <img class="topic-photo" src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=900&q=85" alt="Revisión de un plan de seguimiento">
+ <table>
+  <tr><th>Acción</th><th>24 horas</th><th>7 días</th><th>30 días</th></tr>
+  <tr><td>Enviar propuesta de guía de grupos a docentes</td><td>✓</td><td></td><td></td></tr>
+  <tr><td>Recopilar comentarios sobre roles sugeridos</td><td>✓</td><td></td><td></td></tr>
+  <tr><td>Presentar indicadores de aprendizaje a la comunidad estudiantil</td><td></td><td>✓</td><td></td></tr>
+  <tr><td>Ajustar la guía según el feedback recibido</td><td></td><td></td><td>✓</td></tr>
+ </table>
+ <div class="grid2" style="margin-top:25px">
+  <div class="card"><h3>Recomendación</h3><p>Revisar la metodología de formación de grupos con prioridad alta.</p></div>
+  <div class="card"><h3>Idea adicional</h3><p>Introducir un módulo de autoevaluación grupal como propuesta de prioridad media.</p></div>
+ </div>
+ <div class="footer"><span>Plan de seguimiento</span><span>09</span></div>
+</section>
+
+<section class="slide has-topic-photo">
+ <div class="topline"></div>
+ <div class="brand">CONCLUSIONES <span>• SÍNTESIS</span></div>
+ <h2>9. Conclusiones principales</h2>
+ <img class="topic-photo" src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=900&q=85" alt="Estudiantes revisando resultados académicos">
+ <div class="grid2">
+  <div class="card">
+   <div class="num">01</div>
+   <p>Las reuniones muestran una preocupación por mejorar la <strong>dinámica del trabajo grupal</strong> y hacer más claras las responsabilidades.</p>
+  </div>
+  <div class="card">
+   <div class="num">02</div>
+   <p>La colaboración necesita una estructura que permita diferenciar la participación superficial del <strong>trabajo colaborativo real</strong>.</p>
+  </div>
+  <div class="card">
+   <div class="num">03</div>
+   <p>El uso de IA requiere <strong>supervisión y criterios</strong> para que apoye el aprendizaje sin sustituir la reflexión del estudiante.</p>
+  </div>
+  <div class="card">
+   <div class="num">04</div>
+   <p>El éxito de las propuestas depende de una planificación clara, asignación de responsabilidades, indicadores y seguimiento.</p>
+  </div>
+ </div>
+ <div class="quote" style="margin-top:25px">La conclusión de los documentos apunta a profundizar la metodología, definir roles e incorporar indicadores para evaluar el progreso.</div>
+ <div class="footer"><span>Síntesis de ambas reuniones</span><span>10</span></div>
+</section>
+
+<section class="slide">
+ <div class="topline"></div>
+ <div class="hero">
+  <div>
+   <div class="brand">CIERRE <span>• GRACIAS</span></div>
+   <h1>Mejorar la colaboración es <span class="orange">mejorar el aprendizaje</span></h1>
+   <div class="orange-line"></div>
+   <p class="subtitle">La propuesta combina organización de equipos, roles definidos, uso responsable de IA, indicadores y seguimiento continuo.</p>
+   <span class="badge">Fin de la presentación</span>
+  </div>
+  <div class="heroBox">
+   <div class="image-grid">
+    <div class="photo-card">
+     <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=700&q=80" alt="Colaboración académica">
+    </div>
+    <div class="photo-card">
+     <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=700&q=80" alt="Trabajo en clase">
+    </div>
+   </div>
+   <p style="text-align:center;margin-top:22px;font-weight:700;color:var(--navy)">Organizar → Participar → Evaluar → Mejorar</p>
+  </div>
+ </div>
+ <div class="footer"><span>Asistente Académico Beto • Universidad Estatal de Milagro</span><span>11</span></div>
+</section>
+
+</div>
+
+<div class="controls">
+ <button onclick="prev()">‹</button>
+ <button onclick="next()">›</button>
+</div>
+<div class="progress" id="progress"></div>
+
+<script>
+let current=0;
+const slides=[...document.querySelectorAll('.slide')];
+function show(n){
+ current=(n+slides.length)%slides.length;
+ slides.forEach((s,i)=>s.classList.toggle('active',i===current));
+ document.getElementById('progress').style.width=((current+1)/slides.length*100)+'%';
+}
+function next(){show(current+1)}
+function prev(){show(current-1)}
+document.addEventListener('keydown',e=>{
+ if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown') next();
+ if(e.key==='ArrowLeft'||e.key==='PageUp') prev();
+ if(e.key==='Home') show(0);
+ if(e.key==='End') show(slides.length-1);
+});
+let startX=null;
+document.addEventListener('touchstart',e=>startX=e.touches[0].clientX);
+document.addEventListener('touchend',e=>{
+ if(startX===null)return;
+ let dx=e.changedTouches[0].clientX-startX;
+ if(Math.abs(dx)>50) dx<0?next():prev();
+ startX=null;
+});
+show(0);
+</script>
+</body>
+</html>

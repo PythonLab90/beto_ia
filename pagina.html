@@ -1,0 +1,2823 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente Beto | IA Inteligente</title>
+    <!-- Google Fonts: identidad de Beto y plantilla de presentaciones -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Lectores de archivos y Markdown -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: radial-gradient(circle at 10% 20%, rgba(219, 234, 254, 0.8) 0%, rgba(239, 246, 255, 0.9) 90%);
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #0f172a;
+            overflow-x: hidden;
+        }
+
+        /* Ambient background glow for visual beauty */
+        .ambient-glow {
+            position: fixed;
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(147, 197, 253, 0) 70%);
+            bottom: -100px;
+            right: -100px;
+            pointer-events: none;
+            z-index: 0;
+            animation: pulseGlow 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1) translate(0, 0); opacity: 0.6; }
+            100% { transform: scale(1.25) translate(-40px, -40px); opacity: 0.9; }
+        }
+
+        .beto {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        /* Widget Container */
+        .asistente {
+            position: fixed;
+            right: 28px;
+            bottom: 28px;
+            width: 112px;
+            height: 112px;
+            z-index: 9999;
+        }
+
+        .asistente::before {
+            position: absolute;
+            inset: 6px;
+            content: "";
+            border: 2px solid rgba(59, 130, 246, 0.4);
+            border-radius: 50%;
+            box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.08), 0 0 35px rgba(59, 130, 246, 0.4);
+            animation: respirar 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .asistente::after {
+            position: absolute;
+            top: 2px;
+            left: 50%;
+            width: 12px;
+            height: 12px;
+            content: "";
+            border-radius: 50%;
+            background: #f59e0b;
+            box-shadow: 0 0 14px #f59e0b;
+            transform: translateX(-50%);
+            animation: orbitar 5s linear infinite;
+            transform-origin: 0 54px;
+            pointer-events: none;
+        }
+
+        /* Sparkles */
+        .destello {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 0 12px 3px rgba(96, 165, 250, 0.9);
+            pointer-events: none;
+            animation: aparecer 2.5s ease-in-out infinite;
+        }
+        .destello-uno { top: 16px; left: 12px; }
+        .destello-dos { right: 6px; bottom: 30px; width: 6px; height: 6px; animation-delay: .8s; }
+        .destello-tres { left: 24px; bottom: 8px; width: 5px; height: 5px; animation-delay: 1.6s; }
+
+        /* Assistant Trigger Button */
+        .boton-asistente {
+            position: absolute;
+            inset: 12px;
+            width: 88px;
+            height: 88px;
+            padding: 6px;
+            border: 3.5px solid #ffffff;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            box-shadow: 0 12px 30px rgba(37, 99, 235, 0.35);
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+            z-index: 1;
+            overflow: hidden;
+            animation: flotar 3.5s ease-in-out infinite;
+        }
+
+        .boton-asistente::after {
+            position: absolute;
+            top: -30%;
+            left: -75%;
+            width: 45%;
+            height: 160%;
+            content: "";
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            transform: rotate(25deg);
+            animation: brillo 4s ease-in-out infinite;
+        }
+
+        .boton-asistente:hover {
+            transform: scale(1.1) rotate(3deg);
+            box-shadow: 0 16px 36px rgba(37, 99, 235, 0.45);
+        }
+
+        .boton-asistente:active {
+            transform: scale(0.95);
+        }
+
+        /* Chat Window */
+        .ventana-chat {
+            position: absolute;
+            right: 0;
+            bottom: 104px;
+            width: min(590px, calc(100vw - 32px));
+            height: 620px;
+            max-height: calc(100vh - 120px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.22), 0 0 1px 1px rgba(255, 255, 255, 0.9) inset;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px) scale(0.94);
+            transform-origin: bottom right;
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .ventana-chat.abierta {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Chat Header */
+        .encabezado-chat {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px;
+            color: #ffffff;
+            background: linear-gradient(135deg, #1e40af, #2563eb, #3b82f6);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.15);
+        }
+
+        .identidad-chat {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar-chat-container {
+            position: relative;
+        }
+
+        .avatar-chat-container::after {
+            position: absolute;
+            right: -8px;
+            bottom: -2px;
+            content: "";
+            font-size: 25px;
+            opacity: 0;
+            transform: scale(0.6) rotate(-18deg);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .avatar-chat-container.saludando::after {
+            content: "👋";
+            opacity: 1;
+            transform: scale(1) rotate(8deg);
+            animation: manoSaludo 0.55s ease-in-out infinite alternate;
+        }
+
+        .avatar-chat-container.feliz::after {
+            content: "✨";
+            opacity: 1;
+            transform: scale(1) rotate(8deg);
+            animation: brilloFeliz 0.8s ease-in-out infinite alternate;
+        }
+
+        .avatar-chat-container.hablando::after {
+            content: "💬";
+            opacity: 1;
+            transform: scale(1) rotate(8deg);
+            animation: burbujaHabla 0.8s ease-in-out infinite alternate;
+        }
+
+        .avatar-chat {
+            width: 48px;
+            height: 48px;
+            border: 2.5px solid rgba(255, 255, 255, 0.85);
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .avatar-chat-container.saludando .avatar-chat {
+            animation: personajeSaluda 1.1s ease-in-out infinite;
+            transform-origin: 50% 100%;
+        }
+
+        .avatar-chat-container.feliz .avatar-chat {
+            animation: personajeFeliz 0.8s ease-in-out infinite alternate;
+        }
+
+        .avatar-chat-container.hablando .avatar-chat {
+            animation: personajeHabla 0.35s ease-in-out infinite alternate;
+        }
+
+        .acciones-beto {
+            display: flex;
+            gap: 7px;
+            padding: 9px 16px;
+            overflow-x: auto;
+            background: #eff6ff;
+            border-bottom: 1px solid #dbeafe;
+        }
+
+        .accion-beto {
+            flex: 0 0 auto;
+            padding: 6px 10px;
+            border: 1px solid #bfdbfe;
+            border-radius: 999px;
+            color: #1e40af;
+            background: #ffffff;
+            font: 600 12px inherit;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+        }
+
+        .accion-beto:hover,
+        .accion-beto.activa {
+            color: #ffffff;
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .encabezado-chat strong {
+            display: block;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+        }
+
+        .estado-chat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 2px;
+            font-size: 12.5px;
+            font-weight: 500;
+            opacity: 0.95;
+        }
+
+        .estado-punto {
+            position: relative;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+        .estado-punto::after {
+            position: absolute;
+            inset: -3px;
+            content: "";
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.4);
+            animation: pulseRing 1.8s infinite;
+        }
+
+        @keyframes pulseRing {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        .cerrar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border: 0;
+            border-radius: 50%;
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.15);
+            font-size: 20px;
+            line-height: 1;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .encabezado-chat {
+            cursor: move;
+            user-select: none;
+            touch-action: none;
+        }
+
+        .ventana-chat.redimensionando {
+            resize: both;
+            overflow: hidden;
+            min-width: 360px;
+            min-height: 420px;
+        }
+
+        .cerrar:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        /* Messages Area */
+        .mensajes {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            padding: 20px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .mensajes::-webkit-scrollbar {
+            width: 6px;
+        }
+        .mensajes::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .mensajes::-webkit-scrollbar-thumb {
+            background: rgba(203, 213, 225, 0.7);
+            border-radius: 10px;
+        }
+
+        /* Message Bubbles */
+        .mensaje-wrapper {
+            display: flex;
+            flex-direction: column;
+            animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .mensaje-usuario {
+            align-self: flex-end;
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 18px 18px 4px 18px;
+            color: #ffffff;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.2);
+            font-size: 14.5px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .mensaje-beto-container {
+            align-self: flex-start;
+            max-width: 90%;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .avatar-mini {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-top: 2px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .mensaje-beto {
+            position: relative;
+            padding: 14px 18px;
+            border-radius: 18px 18px 18px 4px;
+            color: #1e293b;
+            background: #ffffff;
+            border: 1px solid rgba(226, 232, 240, 0.95);
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+            font-size: 14.5px;
+            line-height: 1.6;
+            word-wrap: break-word;
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        /* Beautiful Markdown Styling */
+        .mensaje-beto p {
+            margin-bottom: 10px;
+        }
+        .mensaje-beto p:last-child {
+            margin-bottom: 0;
+        }
+        .mensaje-beto strong {
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .mensaje-beto ul, .mensaje-beto ol {
+            margin: 8px 0 12px 20px;
+        }
+        .mensaje-beto li {
+            margin-bottom: 4px;
+        }
+        .mensaje-beto h1, .mensaje-beto h2, .mensaje-beto h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin: 12px 0 8px 0;
+        }
+        .mensaje-beto code {
+            background: #f1f5f9;
+            color: #2563eb;
+            padding: 2px 6px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 13.5px;
+        }
+        .mensaje-beto pre {
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 12px 16px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+        .mensaje-beto pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        /* Beautiful Table Styling */
+        .mensaje-beto table, table.tabla-markdown {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 12px 0;
+            font-size: 13.5px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+        }
+
+        .mensaje-beto th, table.tabla-markdown th {
+            background: linear-gradient(135deg, #1e40af, #2563eb);
+            color: #ffffff;
+            font-weight: 700;
+            text-align: left;
+            padding: 10px 14px;
+            border-bottom: 2px solid #1d4ed8;
+        }
+
+        .mensaje-beto td, table.tabla-markdown td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #334155;
+            line-height: 1.5;
+            background: #ffffff;
+        }
+
+        .mensaje-beto tr:last-child td, table.tabla-markdown tr:last-child td {
+            border-bottom: none;
+        }
+
+        .mensaje-beto tr:nth-child(even) td, table.tabla-markdown tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+
+        .mensaje-beto tr:hover td, table.tabla-markdown tr:hover td {
+            background: #f1f5f9;
+        }
+
+        .mensaje-error {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
+        /* Document Export Bar */
+        .acciones-exportar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px dashed #cbd5e1;
+        }
+
+        .etiqueta-exportar {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 4px;
+        }
+
+        .btn-exportar {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            font-size: 11.5px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            user-select: none;
+        }
+
+        .btn-exportar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+        }
+
+        .btn-exportar-word:hover {
+            background: #2b579a;
+            color: #ffffff;
+            border-color: #2b579a;
+        }
+
+        .btn-exportar-pdf:hover {
+            background: #dc2626;
+            color: #ffffff;
+            border-color: #dc2626;
+        }
+
+        .btn-exportar-excel:hover {
+            background: #107c41;
+            color: #ffffff;
+            border-color: #107c41;
+        }
+
+        .btn-exportar-txt:hover {
+            background: #475569;
+            color: #ffffff;
+            border-color: #475569;
+        }
+
+        .btn-exportar-pptx:hover {
+            background: #d97706;
+            color: #ffffff;
+            border-color: #d97706;
+        }
+
+        .presentacion-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            padding: 28px;
+            background: linear-gradient(135deg, #ebf3ff, #fdf5ef, #eefaf7);
+            overflow: auto;
+            color: #1d2c44;
+        }
+
+        .presentacion-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            width: min(1180px, 100%);
+            margin: 0 auto 20px;
+            color: #0a2345;
+            font-family: "Poppins", "DM Sans", sans-serif;
+        }
+
+        .presentacion-toolbar strong { font-size: 20px; }
+        .presentacion-toolbar span { color: #5d728d; font-size: 12px; }
+        .presentacion-toolbar-actions { display: flex; gap: 8px; }
+        .presentacion-toolbar button {
+            padding: 10px 14px;
+            border: 1px solid rgba(10,92,179,.14);
+            border-radius: 999px;
+            color: #0a2345;
+            background: #ffffff;
+            font: 700 12px "Poppins", sans-serif;
+            cursor: pointer;
+        }
+        .presentacion-toolbar button:last-child { color: #ffffff; background: linear-gradient(135deg, #0a2345, #3c8dff, #7b61ff); border-color: transparent; }
+        .presentacion-slides {
+            display: grid;
+            gap: 28px;
+            width: min(1180px, 100%);
+            margin: 0 auto;
+        }
+        .presentacion-pdf-export {
+            width: 1180px;
+            padding: 0;
+            background: #f7f9fe;
+        }
+        .presentacion-pdf-export .presentacion-slide-html {
+            min-height: 664px;
+            margin: 0 0 18px;
+            page-break-after: always;
+            break-after: page;
+            box-shadow: none;
+        }
+        .presentacion-slide-html {
+            position: relative;
+            min-height: min(66vw, 660px);
+            padding: clamp(30px, 5vw, 58px) clamp(30px, 7vw, 82px) 54px;
+            overflow: hidden;
+            border-radius: 0;
+            background:
+                radial-gradient(circle at 12% 12%, rgba(87,210,255,.20), transparent 18%),
+                radial-gradient(circle at 88% 14%, rgba(255,123,191,.12), transparent 16%),
+                radial-gradient(circle at 72% 78%, rgba(123,97,255,.12), transparent 20%),
+                linear-gradient(135deg, #ffffff 0%, #f7f9fe 46%, #eef6ff 100%);
+            box-shadow: 0 24px 60px rgba(11,57,118,.14);
+            font-family: "Poppins", "DM Sans", sans-serif;
+        }
+        .presentacion-slide-html.portada { color: #1d2c44; }
+        .presentacion-slide-html::before {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 8px;
+            content: "";
+            background: linear-gradient(90deg, #0a2345 0 30%, #3c8dff 30% 55%, #f5822a 55% 78%, #ff7bbf 78% 100%);
+        }
+        .presentacion-slide-html::after {
+            position: absolute;
+            top: 20px;
+            right: 26px;
+            width: 180px;
+            height: 180px;
+            content: "";
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(245,130,42,.18), transparent 65%);
+            pointer-events: none;
+        }
+        .presentacion-slide-html .slide-brand {
+            position: relative;
+            z-index: 1;
+            margin-top: 2px;
+            color: #0a5cb3;
+            font: 800 12px "Poppins", sans-serif;
+            letter-spacing: .7px;
+            text-transform: uppercase;
+        }
+        .presentacion-slide-html .slide-brand span { color: #f5822a; }
+        .presentacion-slide-html .slide-kicker {
+            position: relative;
+            z-index: 1;
+            color: #0a5cb3;
+            font: 700 11px "Poppins", sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .presentacion-slide-html.portada .slide-kicker { color: #0a5cb3; }
+        .presentacion-slide-html h2 {
+            position: relative;
+            z-index: 1;
+            max-width: 82%;
+            margin: 22px 0 25px;
+            color: #0a2345;
+            font: 800 clamp(28px, 5vw, 48px)/1.04 "Montserrat", sans-serif;
+            letter-spacing: -.8px;
+        }
+        .presentacion-slide-html.portada h2 { color: #0a2345; font-size: clamp(34px, 5vw, 56px); }
+        .presentacion-slide-html.portada .slide-panel { max-width: 72%; }
+        .presentacion-slide-html.has-slide-image.portada h2,
+        .presentacion-slide-html.has-slide-image.portada .slide-panel { max-width: 54%; }
+        .presentacion-slide-html ul {
+            position: relative;
+            z-index: 1;
+            max-width: 70%;
+            margin: 0;
+            padding-left: 22px;
+            color: #1d2c44;
+            font-size: clamp(15px, 1.7vw, 20px);
+            line-height: 1.4;
+        }
+        .presentacion-slide-html.portada ul { color: #1d2c44; }
+        .presentacion-slide-html.portada:not(.has-slide-image) ul { max-width: 100%; }
+        .presentacion-slide-html li { margin: 0 0 14px; padding-left: 6px; }
+        .presentacion-slide-html .slide-panel {
+            position: relative;
+            z-index: 1;
+            max-width: 72%;
+            padding: 20px 24px;
+            border: 1px solid rgba(11,92,179,.08);
+            border-radius: 18px;
+            background: linear-gradient(180deg, #fff, #f9fbff);
+            box-shadow: 0 18px 40px rgba(20,61,120,.08);
+        }
+        .presentacion-slide-html .slide-panel::before {
+            display: block;
+            height: 4px;
+            margin: -20px -24px 16px;
+            content: "";
+            background: linear-gradient(90deg, #3c8dff, #f5822a, #ff7bbf);
+        }
+        .presentacion-slide-html:not(.portada) .slide-panel { max-width: 100%; }
+        .presentacion-slide-html.has-slide-image:not(.portada) .slide-panel,
+        .presentacion-slide-html.has-slide-image:not(.portada) h2 { max-width: 64%; }
+        .presentacion-slide-html .slide-panel.visual-panel { padding: 20px 24px 24px; }
+        .slide-card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+        .slide-card-item {
+            min-height: 145px;
+            padding: 16px;
+            border: 1px solid rgba(10,92,179,.1);
+            border-radius: 12px;
+            background: linear-gradient(180deg, #ffffff, #f4f9ff);
+            box-shadow: 0 10px 22px rgba(20,61,120,.07);
+        }
+        .slide-card-item strong { display: block; margin-bottom: 8px; color: #0a2345; font: 800 17px "Montserrat", sans-serif; }
+        .slide-card-item span { display: block; color: #5d728d; font-size: 15px; line-height: 1.5; }
+        .slide-card-number { display: block; margin-bottom: 8px; color: #f5822a; font: 900 25px "Montserrat", sans-serif; }
+        .slide-timeline { display: grid; gap: 0; }
+        .slide-timeline-item { position: relative; display: grid; grid-template-columns: 42px 1fr; min-height: 62px; }
+        .slide-timeline-item::before { position: absolute; top: 22px; bottom: -2px; left: 13px; width: 2px; content: ""; background: #b8d7f7; }
+        .slide-timeline-item:last-child::before { display: none; }
+        .slide-timeline-dot { position: relative; z-index: 1; width: 28px; height: 28px; border: 5px solid #ffffff; border-radius: 50%; background: #3c8dff; box-shadow: 0 0 0 2px #3c8dff; }
+        .slide-timeline-item:nth-child(2n) .slide-timeline-dot { background: #f5822a; box-shadow: 0 0 0 2px #f5822a; }
+        .slide-timeline-item:nth-child(3n) .slide-timeline-dot { background: #ff7bbf; box-shadow: 0 0 0 2px #ff7bbf; }
+        .slide-timeline-item strong { display: block; margin-bottom: 3px; color: #0a2345; font: 800 17px "Montserrat", sans-serif; }
+        .slide-timeline-item span { display: block; color: #5d728d; font-size: 15px; line-height: 1.5; }
+        .slide-data-table { width: 100%; border-collapse: separate; border-spacing: 0; overflow: hidden; border: 1px solid #dce8f5; border-radius: 12px; background: #ffffff; }
+        .slide-data-table th { padding: 11px 13px; color: #ffffff; background: linear-gradient(135deg, #0a2345, #0a5cb3); font: 700 12px "Poppins", sans-serif; text-align: left; }
+        .slide-data-table td { padding: 13px 15px; border-top: 1px solid #e8eef6; color: #334e68; font-size: 15px; line-height: 1.45; vertical-align: top; }
+        .slide-data-table tr:nth-child(even) td { background: #f7faff; }
+        .slide-bars { display: grid; gap: 13px; }
+        .slide-bar-row { display: grid; grid-template-columns: minmax(120px, 1fr) 2fr; align-items: center; gap: 12px; }
+        .slide-bar-row strong { overflow: hidden; color: #0a2345; font-size: 16px; text-overflow: ellipsis; white-space: nowrap; }
+        .slide-bar-track { height: 16px; overflow: hidden; border-radius: 99px; background: #e5eef8; }
+        .slide-bar-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #3c8dff, #7b61ff, #ff7bbf); }
+        @media (max-width: 760px) {
+            .slide-card-grid { grid-template-columns: 1fr 1fr; }
+            .slide-bar-row { grid-template-columns: 1fr; gap: 5px; }
+        }
+        .slide-ilustracion {
+            position: absolute;
+            right: 6%;
+            bottom: 10%;
+            width: 28%;
+            max-width: 270px;
+            opacity: .95;
+        }
+        .slide-foto {
+            position: absolute;
+            right: 5%;
+            top: 23%;
+            width: 29%;
+            height: 49%;
+            object-fit: cover;
+            border: 8px solid rgba(255,255,255,.9);
+            border-radius: 4px;
+            box-shadow: 0 18px 34px rgba(16,42,67,.18);
+            transform: rotate(2deg);
+        }
+        .presentacion-slide-html.portada .slide-foto { border-color: rgba(246,189,96,.85); }
+        .slide-footer {
+            position: absolute;
+            right: 6%;
+            bottom: 6%;
+            color: #7d8ca0;
+            font: 600 11px "Poppins", sans-serif;
+            letter-spacing: .8px;
+        }
+        .presentacion-slide-html.portada .slide-footer { color: #7d8ca0; }
+        @media (max-width: 640px) {
+            .presentacion-overlay { padding: 14px; }
+            .presentacion-toolbar { align-items: flex-start; flex-direction: column; }
+            .presentacion-slide-html { min-height: 520px; padding: 34px 28px 30px 34px; }
+            .presentacion-slide-html h2, .presentacion-slide-html ul,
+            .presentacion-slide-html:not(.portada) .slide-panel,
+            .presentacion-slide-html:not(.portada) h2 { max-width: 100%; }
+            .presentacion-slide-html.portada h2,
+            .presentacion-slide-html.portada .slide-panel,
+            .presentacion-slide-html:not(.portada) .slide-panel { max-width: 100%; }
+            .slide-card-grid { grid-template-columns: 1fr; }
+            .slide-ilustracion { right: 7%; bottom: 12%; width: 28%; opacity: .55; }
+            .slide-foto { position: relative; top: auto; right: auto; width: 100%; height: 180px; margin-top: 18px; transform: none; }
+        }
+
+        /* Suggestion Chips */
+        .sugerencias-container {
+            padding: 0 20px 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .chip-sugerencia {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 12px;
+            border: 1px solid rgba(203, 213, 225, 0.8);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.85);
+            color: #334155;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+
+        .chip-sugerencia:hover {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        /* Typing Dots Animation */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 14px 18px;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #94a3b8;
+            animation: bounceDot 1.4s infinite ease-in-out;
+        }
+
+        .dot:nth-child(1) { animation-delay: 0s; }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounceDot {
+            0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+            40% { transform: translateY(-7px); opacity: 1; background: #2563eb; }
+        }
+
+        /* Input Form */
+        .formulario {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 18px;
+            background: #ffffff;
+            border-top: 1px solid rgba(226, 232, 240, 0.9);
+        }
+
+        .input-container {
+            position: relative;
+            flex: 1;
+        }
+
+        .boton-archivo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            min-width: 48px;
+            height: 48px;
+            border: 1.5px solid #dbeafe;
+            border-radius: 14px;
+            color: #2563eb;
+            background: #eff6ff;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .boton-archivo:hover {
+            background: #dbeafe;
+            box-shadow: 0 5px 14px rgba(37, 99, 235, 0.16);
+            transform: translateY(-2px);
+        }
+
+        .boton-archivo.escuchando {
+            color: #ffffff;
+            background: #dc2626;
+            border-color: #dc2626;
+            box-shadow: 0 5px 14px rgba(220, 38, 38, 0.25);
+        }
+
+        .boton-archivo:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        .boton-archivo:focus-visible {
+            outline: 3px solid rgba(37, 99, 235, 0.2);
+            outline-offset: 2px;
+        }
+
+        .boton-archivo svg {
+            width: 21px;
+            height: 21px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .archivo-seleccionado {
+            display: none;
+            align-items: center;
+            gap: 7px;
+            max-width: 220px;
+            margin: 0 18px 10px;
+            padding: 8px 10px;
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            color: #1e40af;
+            background: #eff6ff;
+            font-size: 12px;
+        }
+
+        .archivo-seleccionado.visible {
+            display: flex;
+        }
+
+        .archivo-seleccionado span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .quitar-archivo {
+            flex-shrink: 0;
+            margin-left: auto;
+            border: 0;
+            color: #1d4ed8;
+            background: transparent;
+            font-size: 17px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .quitar-archivo:hover {
+            color: #1e3a8a;
+        }
+
+        .formulario input {
+            width: 100%;
+            height: 48px;
+            padding: 0 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            color: #0f172a;
+            background: #f8fafc;
+            font-size: 14.5px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .formulario input:focus {
+            outline: none;
+            background: #ffffff;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+        }
+
+        .formulario button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            min-width: 48px;
+            height: 48px;
+            border: 0;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .formulario button:hover:not(:disabled) {
+            transform: scale(1.06);
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
+        }
+
+        .formulario button:active:not(:disabled) {
+            transform: scale(0.94);
+        }
+
+        .formulario button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .formulario button.cancelando {
+            background: #dc2626;
+            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);
+            font-size: 28px;
+            line-height: 1;
+        }
+
+        .formulario button.cancelando:hover:not(:disabled) {
+            box-shadow: 0 6px 18px rgba(220, 38, 38, 0.4);
+        }
+
+        .formulario button img {
+            width: 20px;
+            height: 20px;
+            filter: brightness(0) invert(1);
+            transition: transform 0.2s ease;
+        }
+
+        .formulario button:hover img {
+            transform: translateX(2px);
+        }
+
+        .formulario .boton-archivo {
+            border: 1.5px solid #dbeafe;
+            background: #eff6ff;
+            box-shadow: none;
+        }
+
+        .formulario .boton-archivo:hover {
+            background: #dbeafe;
+            box-shadow: 0 5px 14px rgba(37, 99, 235, 0.16);
+            transform: translateY(-2px);
+        }
+
+        .formulario .boton-archivo:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        /* Keyframes */
+        @keyframes respirar {
+            0%, 100% { transform: scale(.94); opacity: .6; }
+            50% { transform: scale(1.06); opacity: 1; }
+        }
+
+        @keyframes orbitar {
+            to { transform: translateX(-50%) rotate(360deg); }
+        }
+
+        @keyframes aparecer {
+            0%, 100% { opacity: .3; transform: scale(.7); }
+            50% { opacity: 1; transform: scale(1.3); }
+        }
+
+        @keyframes flotar {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        @keyframes brillo {
+            0%, 55% { left: -75%; }
+            80%, 100% { left: 140%; }
+        }
+
+        @keyframes personajeSaluda {
+            0%, 100% { transform: rotate(0deg) translateY(0); }
+            25% { transform: rotate(-7deg) translateY(-2px); }
+            75% { transform: rotate(7deg) translateY(-2px); }
+        }
+
+        @keyframes personajeFeliz {
+            from { transform: translateY(0) rotate(-3deg); }
+            to { transform: translateY(-4px) rotate(3deg); }
+        }
+
+        @keyframes personajeHabla {
+            from { transform: translateY(0) scale(1); }
+            to { transform: translateY(-1px) scale(1.04); }
+        }
+
+        @keyframes manoSaludo {
+            from { transform: scale(1) rotate(-8deg); }
+            to { transform: scale(1.12) rotate(12deg); }
+        }
+
+        @keyframes brilloFeliz {
+            from { transform: scale(0.8) rotate(-12deg); opacity: 0.55; }
+            to { transform: scale(1.2) rotate(12deg); opacity: 1; }
+        }
+
+        @keyframes burbujaHabla {
+            from { transform: scale(0.9) translateY(2px); }
+            to { transform: scale(1.1) translateY(-2px); }
+        }
+
+        @media (max-width: 520px) {
+            .asistente {
+                right: 16px;
+                bottom: 16px;
+            }
+            .ventana-chat {
+                bottom: 96px;
+                right: 0;
+                width: calc(100vw - 32px);
+                height: calc(100vh - 120px);
+            }
+        }
+
+        body.beto-embed {
+            overflow: hidden;
+            background: #ffffff;
+        }
+        body.beto-embed .ambient-glow,
+        body.beto-embed .boton-asistente,
+        body.beto-embed .destello,
+        body.beto-embed .asistente::before,
+        body.beto-embed .asistente::after {
+            display: none;
+        }
+        body.beto-embed .asistente {
+            position: static;
+            width: 100%;
+            height: 100vh;
+        }
+        body.beto-embed .ventana-chat,
+        body.beto-embed .ventana-chat.abierta {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            max-width: none;
+            max-height: none;
+            border: 0;
+            border-radius: 0;
+            opacity: 1;
+            pointer-events: auto;
+            transform: none;
+            resize: none;
+        }
+        body.beto-embed .cerrar {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="ambient-glow"></div>
+
+    <div class="asistente">
+        <span class="destello destello-uno"></span>
+        <span class="destello destello-dos"></span>
+        <span class="destello destello-tres"></span>
+
+        <section class="ventana-chat" id="ventanaChat" aria-hidden="true">
+            <header class="encabezado-chat">
+                <div class="identidad-chat">
+                    <div class="avatar-chat-container">
+                        <img src="img/beto.png" alt="Beto Assistant" class="avatar-chat">
+                    </div>
+                    <div>
+                        <strong>Beto IA <small style="font-size:11px;opacity:0.8;font-weight:500;">(UNEMI Moodle)</small></strong>
+                        <div class="estado-chat">
+                            <span class="estado-punto"></span>
+                            <span id="estadoTexto">En línea con tu clase</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="cerrar" id="cerrarChat" type="button" aria-label="Cerrar chat">&times;</button>
+            </header>
+
+            <div id="bannerLogin" style="display:none;padding:12px 16px;background:linear-gradient(135deg, #1d4ed8, #2563eb);color:#ffffff;border-bottom:1px solid rgba(255,255,255,0.25);box-shadow:0 4px 12px rgba(29,78,216,0.25);">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <span style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;">
+                        🔐 <span>Asistente de Inicio de Sesión UNEMI</span>
+                    </span>
+                    <span style="font-size:10px;background:rgba(255,255,255,0.2);padding:2px 7px;border-radius:10px;font-weight:600;">login/index.php</span>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+                    <input id="loginUsername" type="text" placeholder="Usuario Moodle" style="padding:7px 10px;border-radius:8px;border:1px solid #93c5fd;font-size:12px;color:#0f172a;background:#ffffff;outline:none;">
+                    <input id="loginPassword" type="password" placeholder="Contraseña" style="padding:7px 10px;border-radius:8px;border:1px solid #93c5fd;font-size:12px;color:#0f172a;background:#ffffff;outline:none;">
+                </div>
+                <div style="display:flex;gap:6px;">
+                    <button type="button" id="btnLoginFillSubmit" style="flex:1;padding:8px 12px;border-radius:8px;border:0;background:linear-gradient(135deg, #f59e0b, #d97706);color:#ffffff;font-weight:700;font-size:12px;cursor:pointer;box-shadow:0 3px 8px rgba(245,158,11,0.4);transition:transform 0.2s ease;">
+                        🔑 Iniciar Sesión en 1 Clic
+                    </button>
+                    <button type="button" id="btnLoginSave" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.2);color:#ffffff;font-weight:600;font-size:11.5px;cursor:pointer;">
+                        💾 Guardar
+                    </button>
+                </div>
+            </div>
+
+            <div id="bannerCurso" style="display:none;padding:8px 16px;background:#e0f2fe;border-bottom:1px solid #bae6fd;color:#0369a1;font-size:12px;font-weight:600;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                <span>📍</span> <span id="nombreCursoDetectado">Curso no detectado</span>
+            </div>
+
+            <div class="acciones-beto" aria-label="Acciones de Beto">
+                <button class="accion-beto" type="button" data-accion="saludando">👋 Saludar</button>
+                <button class="accion-beto" type="button" data-accion="feliz">✨ Modo Clase</button>
+                <button class="accion-beto" type="button" data-accion="hablando">💬 Explicar</button>
+            </div>
+
+            <div class="mensajes" id="mensajes">
+                <div class="mensaje-wrapper">
+                    <div class="mensaje-beto-container">
+                        <img src="img/beto.png" alt="" class="avatar-mini">
+                        <div class="mensaje-beto">
+                            ¡Hola! 👋 Soy **Beto**, tu asistente universitario en Moodle.
+                            
+                            Puedo ayudarte a estudiar, analizar la clase y **crear documentos de Word (.docx), PDF (.pdf) y Excel (.xlsx)**. ¿Qué te gustaría hacer?
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suggestion Chips for Moodle & Document Generation -->
+            <div class="sugerencias-container" id="sugerencias" style="display:flex;gap:6px;padding:8px 16px;overflow-x:auto;background:#f8fafc;border-top:1px solid #e2e8f0;">
+                <button type="button" class="chip-sugerencia" onclick="enviarSugerencia('📄 Crea un resumen completo en Word de esta clase')">
+                    📄 Resumen en Word
+                </button>
+                <button type="button" class="chip-sugerencia" onclick="enviarSugerencia('📊 Genera una tabla de estudio en Excel con los temas clave')">
+                    📊 Plan en Excel
+                </button>
+                <button type="button" class="chip-sugerencia" onclick="enviarSugerencia('📕 Crea una guía de repaso en PDF con preguntas de examen')">
+                    📕 Guía en PDF
+                </button>
+                <button type="button" class="chip-sugerencia" onclick="enviarSugerencia('📚 Explícame esta clase y sus temas principales')">
+                    📚 Explícame esta clase
+                </button>
+                <button type="button" class="chip-sugerencia" onclick="enviarSugerencia('📅 ¿Qué tareas o actividades hay pendientes?')">
+                    📅 Tareas y fechas
+                </button>
+            </div>
+
+            <div class="archivo-seleccionado" id="archivoSeleccionado" role="status" aria-live="polite">
+                <span aria-hidden="true">📎</span>
+                <span id="nombreArchivo"></span>
+                <button class="quitar-archivo" id="quitarArchivo" type="button" aria-label="Quitar archivos">&times;</button>
+            </div>
+
+            <form class="formulario" id="formulario">
+                <input id="archivoInput" type="file" accept=".txt,.md,.csv,.json,.js,.py,.html,.css,.xml,.log,.pdf,.docx,.pptx,.ppt,.xlsx,.xls" multiple hidden>
+                <input id="videoInput" type="file" accept="video/mp4,video/webm,video/quicktime,video/x-m4v,video/x-msvideo,video/x-matroska" hidden>
+                <button class="boton-archivo" type="button" id="anadir" aria-label="Añadir archivo" title="Subir documento o presentación (PDF, Word, PPTX, Excel)">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                    </svg>
+                </button>
+                <button class="boton-archivo" type="button" id="anadirVideo" aria-label="Subir video de clase" title="Subir archivo de video o audio de la clase">🎥</button>
+                <button class="boton-archivo" type="button" id="escucharReunion" aria-label="Escuchar reunión" title="Escuchar la reunión y crear un resumen">🎙️</button>
+                <div class="input-container">
+                    <input id="mensajeInput" type="text" placeholder="Pregunta sobre la clase de Moodle..." aria-label="Mensaje" autocomplete="off">
+                </div>
+                <button id="enviar" type="submit" aria-label="Enviar mensaje">
+                    <img src="img/enviar.png" alt="Enviar">
+                </button>
+            </form>
+        </section>
+
+        <button class="boton-asistente" id="abrirChat" type="button" aria-label="Abrir chat con Beto" aria-expanded="false">
+            <img src="img/beto.png" alt="Abrir asistente Beto" class="beto">
+        </button>
+    </div>
+
+    <script>
+        if (new URLSearchParams(window.location.search).get('betoEmbed') === '1') {
+            document.body.classList.add('beto-embed');
+        }
+        const abrirChat = document.getElementById('abrirChat');
+        const cerrarChat = document.getElementById('cerrarChat');
+        const ventanaChat = document.getElementById('ventanaChat');
+        const formulario = document.getElementById('formulario');
+        const mensajeInput = document.getElementById('mensajeInput');
+        const mensajes = document.getElementById('mensajes');
+        const sugerencias = document.getElementById('sugerencias');
+        const anadirArchivo = document.getElementById('anadir');
+        const archivoInput = document.getElementById('archivoInput');
+        const videoInput = document.getElementById('videoInput');
+        const anadirVideo = document.getElementById('anadirVideo');
+        const escucharReunion = document.getElementById('escucharReunion');
+        const archivoSeleccionado = document.getElementById('archivoSeleccionado');
+        const nombreArchivo = document.getElementById('nombreArchivo');
+        const quitarArchivo = document.getElementById('quitarArchivo');
+        const avatarChatContainer = document.querySelector('.avatar-chat-container');
+        const accionesBeto = document.querySelectorAll('.accion-beto');
+        const botonEnviar = document.getElementById('enviar');
+        let archivosSeleccionados = [];
+        let contenidosArchivos = [];
+        let contextoPagina = '';
+        const solicitudesVideo = new Map();
+        let controladorSolicitud = null;
+        let reconocimientoReunion = null;
+        let escuchandoReunion = false;
+        let detenerReunionSolicitado = false;
+        let flujoMicrofonoReunion = null;
+        let transcripcionReunion = '';
+        let temporizadorReunion = null;
+        let inicioReunion = 0;
+        const duracionMaximaReunion = 60 * 60 * 1000;
+        let arrastrandoChat = null;
+        window.contextoWeb = null;
+        const allowedParentOrigins = Array.isArray(window.BETO_ALLOWED_ORIGINS)
+            ? window.BETO_ALLOWED_ORIGINS
+            : [];
+
+        function isAllowedParent(event) {
+            return event.source === window.parent
+                && event.origin !== 'null'
+                && (!allowedParentOrigins.length || allowedParentOrigins.includes(event.origin));
+        }
+
+        function animarBeto(accion) {
+            if (!avatarChatContainer) return;
+            avatarChatContainer.classList.remove('saludando', 'feliz', 'hablando');
+            accionesBeto.forEach(boton => boton.classList.toggle('activa', boton.dataset.accion === accion));
+            if (accion) avatarChatContainer.classList.add(accion);
+        }
+
+        accionesBeto.forEach(boton => {
+            boton.addEventListener('click', () => {
+                const accion = boton.dataset.accion;
+                animarBeto(accion);
+                window.setTimeout(() => animarBeto(''), 3200);
+            });
+        });
+
+        window.addEventListener('message', (event) => {
+            if (!event.data || !['contexto-curso', 'contexto-web'].includes(event.data.tipo)) return;
+            if (!isAllowedParent(event)) return;
+
+            const contenido = event.data.contenido;
+            if (event.data.tipo === 'contexto-web') {
+                console.log('MENSAJE RECIBIDO DESDE LA PÁGINA:');
+                console.log(event.data);
+                window.contextoWeb = contenido;
+                console.log('CONTEXTO GUARDADO:');
+                console.log(window.contextoWeb);
+                console.log('TEXTO:');
+                console.log(window.contextoWeb?.texto || '');
+                console.log('ENLACES:');
+                console.log(window.contextoWeb?.enlaces || []);
+                console.log('CANTIDAD DE ENLACES:');
+                console.log(Array.isArray(window.contextoWeb?.enlaces) ? window.contextoWeb.enlaces.length : 0);
+                if (event.source && event.origin) {
+                    event.source.postMessage({ tipo: 'contexto-recibido' }, event.origin);
+                }
+            }
+
+            if (typeof contenido === 'string') {
+                contextoPagina = contenido.trim().slice(0, 12000);
+                return;
+            }
+
+            if (!contenido || typeof contenido !== 'object') return;
+
+            const texto = String(contenido.texto || '').trim();
+            const enlaces = Array.isArray(contenido.enlaces)
+                ? contenido.enlaces.map(enlace => {
+                    if (typeof enlace === 'string') return enlace;
+                    return [enlace.titulo || enlace.texto, enlace.url || enlace.href]
+                        .filter(Boolean)
+                        .join(': ');
+                }).filter(Boolean)
+                : [];
+
+            contextoPagina = [
+                texto,
+                enlaces.length ? `Enlaces de la página:\n${enlaces.join('\n')}` : '',
+                Array.isArray(contenido.tareas) && contenido.tareas.length
+                    ? `Tareas y recursos detectados:\n${contenido.tareas.map(item => `${item.titulo}: ${item.url}`).join('\n')}`
+                    : '',
+                Array.isArray(contenido.fechas) && contenido.fechas.length
+                    ? `Fechas detectadas: ${contenido.fechas.join(', ')}`
+                    : ''
+            ].filter(Boolean).join('\n\n').slice(0, 12000);
+        });
+
+        window.addEventListener('message', event => {
+            if (event.data?.type !== 'beto:page-context' || !isAllowedParent(event)) return;
+
+            const contenido = event.data.context;
+            if (!contenido || typeof contenido !== 'object' || !contenido.site || !contenido.page) return;
+
+            window.webContext = contenido;
+            window.contextoWeb = contenido;
+
+            // Actualizar banner de Moodle si se detecta curso
+            const bannerCurso = document.getElementById('bannerCurso');
+            const nombreCursoDetectado = document.getElementById('nombreCursoDetectado');
+            if (bannerCurso && nombreCursoDetectado && contenido.course?.title) {
+                const tituloCurso = contenido.course.title;
+                const seccion = contenido.course.section ? ` - ${contenido.course.section}` : '';
+                nombreCursoDetectado.textContent = `${tituloCurso}${seccion}`;
+                bannerCurso.style.display = 'flex';
+            }
+
+            // Mostrar u ocultar banner de login
+            const bannerLogin = document.getElementById('bannerLogin');
+            const loginUsername = document.getElementById('loginUsername');
+            const loginPassword = document.getElementById('loginPassword');
+            const btnLoginFillSubmit = document.getElementById('btnLoginFillSubmit');
+            const btnLoginSave = document.getElementById('btnLoginSave');
+
+            if (loginUsername && loginPassword) {
+                try {
+                    const u = localStorage.getItem('beto_user');
+                    const p = localStorage.getItem('beto_pass');
+                    if (u && !loginUsername.value) loginUsername.value = u;
+                    if (p && !loginPassword.value) loginPassword.value = p;
+                } catch (_) {}
+            }
+
+            if (bannerLogin) {
+                if (contenido.site?.isLoginPage || (contenido.site?.url && contenido.site.url.includes('/login/'))) {
+                    bannerLogin.style.display = 'block';
+                    if (bannerCurso) bannerCurso.style.display = 'none';
+                } else {
+                    bannerLogin.style.display = 'none';
+                }
+            }
+
+            contextoPagina = [
+                contenido.course?.title ? `Curso actual: ${contenido.course.title}` : '',
+                contenido.course?.section ? `Sección/Tema: ${contenido.course.section}` : '',
+                `Sitio: ${contenido.site.title || ''}`,
+                `URL: ${contenido.site.url || ''}`,
+                contenido.page.text || '',
+                Array.isArray(contenido.page.headings) && contenido.page.headings.length
+                    ? `Encabezados de la clase:\n${contenido.page.headings.map(item => `${'#'.repeat(item.nivel)} ${item.texto}`).join('\n')}`
+                    : '',
+                Array.isArray(contenido.page.links) && contenido.page.links.length
+                    ? `Enlaces y recursos:\n${contenido.page.links.map(item => `${item.texto}: ${item.url}`).join('\n')}`
+                    : '',
+                Array.isArray(contenido.page.videos) && contenido.page.videos.length
+                    ? `Videos de la clase:\n${contenido.page.videos.map(item => `${item.titulo || 'Video'}: ${item.url}`).join('\n')}`
+                    : '',
+                Array.isArray(contenido.course?.tasks) && contenido.course.tasks.length
+                    ? `Actividades y tareas:\n${contenido.course.tasks.map(item => `${item.titulo}: ${item.url}`).join('\n')}`
+                    : '',
+                Array.isArray(contenido.course?.dates) && contenido.course.dates.length
+                    ? `Fechas límite detectadas: ${contenido.course.dates.join(', ')}`
+                    : ''
+            ].filter(Boolean).join('\n\n').slice(0, 14000);
+
+            event.source.postMessage({ type: 'beto:context-received', version: 1 }, event.origin);
+        });
+
+        // Eventos para botones de Inicio de Sesión
+        document.addEventListener('click', event => {
+            if (event.target?.id === 'btnLoginFillSubmit' || event.target?.closest('#btnLoginFillSubmit')) {
+                const u = document.getElementById('loginUsername')?.value.trim();
+                const p = document.getElementById('loginPassword')?.value.trim();
+                if (!u || !p) return alert('Por favor ingresa usuario y contraseña.');
+                try {
+                    localStorage.setItem('beto_user', u);
+                    localStorage.setItem('beto_pass', p);
+                } catch (_) {}
+                if (window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'beto:fill-credentials',
+                        username: u,
+                        password: p,
+                        submit: true,
+                        save: true
+                    }, '*');
+                }
+            } else if (event.target?.id === 'btnLoginSave' || event.target?.closest('#btnLoginSave')) {
+                const u = document.getElementById('loginUsername')?.value.trim();
+                const p = document.getElementById('loginPassword')?.value.trim();
+                if (!u || !p) return alert('Por favor ingresa usuario y contraseña.');
+                try {
+                    localStorage.setItem('beto_user', u);
+                    localStorage.setItem('beto_pass', p);
+                } catch (_) {}
+                if (window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'beto:fill-credentials',
+                        username: u,
+                        password: p,
+                        submit: false,
+                        save: true
+                    }, '*');
+                }
+                alert('Credenciales guardadas con éxito para autocompletado.');
+            }
+        });
+
+        const solicitudesMoodleResource = new Map();
+
+        window.addEventListener('message', event => {
+            if (event.data?.type === 'beto:moodle-resource-result') {
+                const resolver = solicitudesMoodleResource.get(event.data.requestId);
+                if (!resolver) return;
+                solicitudesMoodleResource.delete(event.data.requestId);
+                resolver(event.data.result || null);
+                return;
+            }
+            if (event.data?.type !== 'beto:video-summary-result') return;
+            const resolver = solicitudesVideo.get(event.data.requestId);
+            if (!resolver) return;
+            solicitudesVideo.delete(event.data.requestId);
+            resolver(event.data.result || { error: 'No se recibió el resumen del video.' });
+        });
+
+        if (window.parent !== window) {
+            try {
+                const parentOrigin = new URLSearchParams(window.location.search).get('betoParentOrigin')
+                    || (document.referrer ? new URL(document.referrer).origin : '');
+                if (parentOrigin && parentOrigin !== 'null') {
+                    window.parent.postMessage({ type: 'beto:ready', version: 1 }, parentOrigin);
+                }
+            } catch (_) {
+                // El iframe puede abrirse directamente sin una página padre válida.
+            }
+        }
+
+        anadirArchivo.addEventListener('click', () => archivoInput.click());
+        anadirVideo.addEventListener('click', () => videoInput.click());
+
+        videoInput.addEventListener('change', async () => {
+            const video = videoInput.files[0];
+            if (!video) return;
+            if (video.size > 500 * 1024 * 1024) {
+                agregarMensajeBeto('El video supera el límite de 500 MB.', true);
+                videoInput.value = '';
+                return;
+            }
+            agregarMensajeUsuario(`Procesar clase: ${video.name}`);
+            const cargandoWrapper = agregarIndicadorCargando();
+            animarBeto('hablando');
+            anadirVideo.disabled = true;
+            try {
+                const datos = new FormData();
+                datos.append('video', video);
+                const respuesta = await fetch('/api/transcribe-video', { method: 'POST', body: datos });
+                const resultado = await respuesta.json();
+                removerCargando();
+                if (!respuesta.ok) {
+                    agregarMensajeBeto(resultado.error || 'No se pudo procesar el video.', true);
+                } else {
+                    agregarMensajeBeto(`## 🎥 Resumen de ${resultado.filename}\n\n${resultado.summary}\n\n<details><summary>Ver transcripción completa</summary>\n\n${resultado.transcript}\n\n</details>`);
+                }
+            } catch (error) {
+                removerCargando();
+                agregarMensajeBeto('No pude procesar el video. Comprueba que el servidor tenga FFmpeg instalado.', true);
+            } finally {
+                animarBeto('');
+                anadirVideo.disabled = false;
+                videoInput.value = '';
+            }
+        });
+
+        escucharReunion.addEventListener('click', async () => {
+            const ReconocimientoVoz = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!ReconocimientoVoz) {
+                agregarMensajeBeto('Tu navegador no permite reconocimiento de voz. Abre Beto en Google Chrome o Microsoft Edge.', true);
+                return;
+            }
+
+            if (escuchandoReunion) {
+                escuchandoReunion = false;
+                detenerReunionSolicitado = true;
+                escucharReunion.textContent = '⏳';
+                escucharReunion.title = 'Preparando el resumen...';
+                clearInterval(temporizadorReunion);
+                reconocimientoReunion.stop();
+                return;
+            }
+
+            if (!navigator.mediaDevices?.getUserMedia) {
+                agregarMensajeBeto('Este navegador no permite acceder al micrófono. Abre Beto desde http://localhost o usa Chrome/Edge.', true);
+                return;
+            }
+
+            try {
+                flujoMicrofonoReunion = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                });
+            } catch (error) {
+                const mensaje = error.name === 'NotAllowedError'
+                    ? 'El micrófono está bloqueado. Pulsa el candado de la barra del navegador, permite el micrófono y vuelve a intentarlo.'
+                    : error.name === 'NotFoundError'
+                        ? 'No se encontró ningún micrófono conectado.'
+                        : 'No se pudo abrir el micrófono. Cierra otra aplicación que lo esté usando y vuelve a intentarlo.';
+                agregarMensajeBeto(mensaje, true);
+                return;
+            }
+
+            flujoMicrofonoReunion.getTracks().forEach(pista => pista.stop());
+            flujoMicrofonoReunion = null;
+
+            transcripcionReunion = '';
+            detenerReunionSolicitado = false;
+            reconocimientoReunion = new ReconocimientoVoz();
+            reconocimientoReunion.lang = 'es-ES';
+            reconocimientoReunion.continuous = true;
+            reconocimientoReunion.interimResults = true;
+
+            reconocimientoReunion.onstart = () => {
+                escuchandoReunion = true;
+                escucharReunion.textContent = '⏹️';
+                escucharReunion.classList.add('escuchando');
+                if (!inicioReunion) inicioReunion = Date.now();
+                escucharReunion.title = 'Detener escucha y generar resumen (00:00 / 60:00)';
+                clearInterval(temporizadorReunion);
+                temporizadorReunion = window.setInterval(() => {
+                    const transcurrido = Date.now() - inicioReunion;
+                    const segundos = Math.floor(transcurrido / 1000);
+                    const minutos = Math.floor(segundos / 60);
+                    const segundosRestantes = String(segundos % 60).padStart(2, '0');
+                    escucharReunion.title = `Detener escucha y generar resumen (${String(minutos).padStart(2, '0')}:${segundosRestantes} / 60:00)`;
+                    if (transcurrido >= duracionMaximaReunion) {
+                        escuchandoReunion = false;
+                        detenerReunionSolicitado = true;
+                        escucharReunion.textContent = '⏳';
+                        escucharReunion.title = 'Preparando el resumen de la reunión';
+                        clearInterval(temporizadorReunion);
+                        reconocimientoReunion.stop();
+                    }
+                }, 1000);
+            };
+
+            reconocimientoReunion.onresult = (event) => {
+                for (let indice = event.resultIndex; indice < event.results.length; indice++) {
+                    if (event.results[indice].isFinal) {
+                        transcripcionReunion += `${event.results[indice][0].transcript.trim()} `;
+                    }
+                }
+            };
+
+            reconocimientoReunion.onerror = (event) => {
+                if (event.error === 'not-allowed' || event.error === 'service-not-allowed' || event.error === 'audio-capture') {
+                    const mensaje = event.error === 'audio-capture'
+                        ? 'Chrome perdió el micrófono. Comprueba que siga conectado y que ninguna otra aplicación lo esté usando.'
+                        : 'El reconocimiento no tiene permiso para usar el micrófono. Revisa el permiso del navegador.';
+                    agregarMensajeBeto(mensaje, true);
+                    escuchandoReunion = false;
+                    detenerReunionSolicitado = true;
+                }
+            };
+
+            reconocimientoReunion.onend = () => {
+                escucharReunion.classList.remove('escuchando');
+                if (escuchandoReunion && !detenerReunionSolicitado) {
+                    try {
+                        reconocimientoReunion.start();
+                    } catch (_) {
+                        // El navegador ya está reiniciando el reconocimiento.
+                    }
+                    return;
+                }
+
+                detenerReunionSolicitado = false;
+                flujoMicrofonoReunion?.getTracks().forEach(pista => pista.stop());
+                flujoMicrofonoReunion = null;
+                escucharReunion.textContent = '🎙️';
+                escucharReunion.title = 'Escuchar y crear resumen con recomendaciones';
+                clearInterval(temporizadorReunion);
+                inicioReunion = 0;
+                if (!transcripcionReunion.trim()) {
+                    agregarMensajeBeto('No alcancé a reconocer palabras. Mantén el micrófono cerca del audio de la reunión e inténtalo de nuevo.', true);
+                    return;
+                }
+
+                procesarMensaje(`Actúa como un secretario ejecutivo experto y analiza toda la transcripción antes de redactar. No hagas un resumen superficial: recupera los puntos importantes de principio a fin, relaciona los temas repetidos y distingue claramente entre hechos mencionados, decisiones confirmadas y propuestas. No inventes nombres, cifras, fechas ni responsabilidades; cuando falte un dato escribe "No especificado". Usa Markdown limpio, profesional y bien estructurado con estas secciones:\n\n# Resumen ejecutivo\nExplica el propósito, contexto, participantes si se mencionan y resultado general de la reunión en varios párrafos breves.\n\n## Puntos fuertes y hallazgos clave\nEnumera los descubrimientos, problemas, riesgos, oportunidades, avances y datos relevantes. Señala qué puntos son críticos o requieren atención.\n\n## Temas tratados en detalle\nCrea una subsección por cada tema importante. Explica qué se comentó, qué argumentos aparecieron y cuál fue la conclusión o situación actual.\n\n## Decisiones tomadas\nCrea una tabla con las columnas: Decisión | Motivo o contexto | Impacto | Confirmada por.\n\n## Tareas y compromisos\nCrea una tabla con las columnas: Tarea | Responsable | Fecha límite | Prioridad | Estado. Incluye todas las acciones identificadas, incluso si quedaron pendientes de confirmar.\n\n## Riesgos, bloqueos y oportunidades\nExplica los problemas que pueden afectar el trabajo, sus consecuencias y las oportunidades detectadas.\n\n## Preguntas y asuntos pendientes\nIncluye cada punto sin resolver, la información que falta y quién debería aclararlo si se mencionó.\n\n## Próximos pasos\nCrea una lista numerada, ordenada por prioridad y basada únicamente en lo conversado.\n\n## Citas, cifras y fechas relevantes\nIncluye frases importantes, números, plazos, nombres de proyectos y fechas mencionadas.\n\n## Conclusión\nCierra con una síntesis clara del estado de la reunión y del resultado esperado. Mantén un tono profesional y útil para compartir con todos los asistentes.\n\nTranscripción completa de la reunión. Analiza todo su contenido:\n${transcripcionReunion.trim()}`);
+            };
+
+            try {
+                reconocimientoReunion.start();
+            } catch (_) {
+                flujoMicrofonoReunion?.getTracks().forEach(pista => pista.stop());
+                flujoMicrofonoReunion = null;
+                agregarMensajeBeto('No pude iniciar el micrófono. Revisa los permisos del navegador.', true);
+            }
+        });
+
+        async function leerArchivo(archivo) {
+            const extension = archivo.name.split('.').pop().toLowerCase();
+
+            if (extension === 'pdf') {
+                if (!window.pdfjsLib) throw new Error('No se cargo el lector PDF.');
+
+                window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+                    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                const documento = await window.pdfjsLib.getDocument({ data: await archivo.arrayBuffer() }).promise;
+                const paginas = [];
+                let trabajadorOCR = null;
+
+                try {
+                    for (let numero = 1; numero <= documento.numPages; numero++) {
+                        const pagina = await documento.getPage(numero);
+                        const contenido = await pagina.getTextContent();
+                        const textoExtraido = contenido.items.map(item => item.str).join(' ').trim();
+
+                        if (textoExtraido.length >= 40) {
+                            paginas.push(textoExtraido);
+                            continue;
+                        }
+
+                        if (!window.Tesseract) throw new Error('No se cargo el lector OCR.');
+                        if (!trabajadorOCR) {
+                            trabajadorOCR = await window.Tesseract.createWorker('spa');
+                        }
+
+                        const escala = 2;
+                        const viewport = pagina.getViewport({ scale: escala });
+                        const canvas = document.createElement('canvas');
+                        canvas.width = viewport.width;
+                        canvas.height = viewport.height;
+                        await pagina.render({
+                            canvasContext: canvas.getContext('2d'),
+                            viewport
+                        }).promise;
+
+                        const resultadoOCR = await trabajadorOCR.recognize(canvas);
+                        const textoReconocido = resultadoOCR.data.text.trim();
+                        paginas.push([textoExtraido, textoReconocido].filter(Boolean).join('\n'));
+                    }
+                } finally {
+                    if (trabajadorOCR) await trabajadorOCR.terminate();
+                }
+
+                return paginas.join('\n\n');
+            }
+
+            if (extension === 'docx') {
+                if (!window.mammoth) throw new Error('No se cargo el lector Word.');
+                const resultado = await window.mammoth.extractRawText({
+                    arrayBuffer: await archivo.arrayBuffer()
+                });
+                return resultado.value;
+            }
+
+            if (extension === 'pptx') {
+                if (window.JSZip) {
+                    try {
+                        const zip = await window.JSZip.loadAsync(await archivo.arrayBuffer());
+                        const slideFiles = Object.keys(zip.files).filter(f => f.startsWith('ppt/slides/slide') && f.endsWith('.xml'));
+                        slideFiles.sort((a, b) => {
+                            const numA = parseInt(a.match(/\d+/)?.[0] || 0);
+                            const numB = parseInt(b.match(/\d+/)?.[0] || 0);
+                            return numA - numB;
+                        });
+                        const slideTexts = [];
+                        for (let i = 0; i < slideFiles.length; i++) {
+                            const xmlText = await zip.files[slideFiles[i]].async('text');
+                            const matches = xmlText.match(/<a:t[^>]*>(.*?)<\/a:t>/g) || [];
+                            const text = matches.map(m => m.replace(/<[^>]+>/g, '').trim()).filter(Boolean).join(' ');
+                            if (text) slideTexts.push(`--- Diapositiva ${i + 1} ---\n${text}`);
+                        }
+                        if (slideTexts.length) return slideTexts.join('\n\n');
+                    } catch (e) {
+                        console.error('Error al procesar PPTX con JSZip:', e);
+                    }
+                }
+            }
+
+            if (extension === 'xlsx' || extension === 'xls') {
+                if (!window.XLSX) throw new Error('No se cargo el lector Excel.');
+
+                const libro = window.XLSX.read(await archivo.arrayBuffer(), { type: 'array' });
+                return libro.SheetNames.map(nombreHoja => {
+                    const hoja = libro.Sheets[nombreHoja];
+                    const filas = window.XLSX.utils.sheet_to_csv(hoja);
+                    return `Hoja: ${nombreHoja}\n${filas}`;
+                }).join('\n\n');
+            }
+
+            return archivo.text();
+        }
+
+        archivoInput.addEventListener('change', async () => {
+            const archivos = Array.from(archivoInput.files);
+            if (!archivos.length) return;
+
+            try {
+                const contenidos = await Promise.all(archivos.map(archivo => leerArchivo(archivo)));
+                if (contenidos.some(contenido => !contenido.trim())) {
+                    throw new Error('Uno de los archivos no contiene texto legible.');
+                }
+                archivosSeleccionados = archivos;
+                contenidosArchivos = contenidos;
+                nombreArchivo.textContent = archivos.length === 1
+                    ? archivos[0].name
+                    : `${archivos.length} documentos seleccionados`;
+                archivoSeleccionado.classList.add('visible');
+            } catch (error) {
+                console.error('Error al leer archivo:', error);
+                archivosSeleccionados = [];
+                contenidosArchivos = [];
+                archivoInput.value = '';
+                agregarMensajeBeto('No pude leer uno de los documentos. Verifica que tenga texto o imágenes legibles.', true);
+            }
+        });
+
+        quitarArchivo.addEventListener('click', () => {
+            archivoInput.value = '';
+            archivosSeleccionados = [];
+            contenidosArchivos = [];
+            nombreArchivo.textContent = '';
+            archivoSeleccionado.classList.remove('visible');
+        });
+
+        function cambiarChat(abierto) {
+            ventanaChat.classList.toggle('abierta', abierto);
+            if (abierto) ventanaChat.classList.add('redimensionando');
+            ventanaChat.setAttribute('aria-hidden', String(!abierto));
+            abrirChat.setAttribute('aria-expanded', String(abierto));
+            if (abierto) {
+                setTimeout(() => mensajeInput.focus(), 150);
+            }
+        }
+
+        abrirChat.addEventListener('click', () => {
+            cambiarChat(!ventanaChat.classList.contains('abierta'));
+        });
+
+        cerrarChat.addEventListener('click', () => cambiarChat(false));
+
+        ventanaChat.querySelector('.encabezado-chat').addEventListener('pointerdown', (event) => {
+            if (event.target.closest('button')) return;
+            if (document.body.classList.contains('beto-embed')) return;
+            const limites = ventanaChat.getBoundingClientRect();
+            ventanaChat.style.position = 'fixed';
+            ventanaChat.style.transform = 'none';
+            ventanaChat.style.transition = 'none';
+            ventanaChat.style.left = `${limites.left}px`;
+            ventanaChat.style.top = `${limites.top}px`;
+            ventanaChat.style.right = 'auto';
+            ventanaChat.style.bottom = 'auto';
+            arrastrandoChat = {
+                offsetX: event.clientX - limites.left,
+                offsetY: event.clientY - limites.top
+            };
+            ventanaChat.setPointerCapture?.(event.pointerId);
+            event.preventDefault();
+        });
+
+        ventanaChat.addEventListener('pointermove', (event) => {
+            if (!arrastrandoChat) return;
+            const izquierda = Math.max(0, Math.min(window.innerWidth - ventanaChat.offsetWidth, event.clientX - arrastrandoChat.offsetX));
+            const arriba = Math.max(0, Math.min(window.innerHeight - ventanaChat.offsetHeight, event.clientY - arrastrandoChat.offsetY));
+            ventanaChat.style.left = `${izquierda}px`;
+            ventanaChat.style.top = `${arriba}px`;
+            ventanaChat.style.right = 'auto';
+            ventanaChat.style.bottom = 'auto';
+        });
+
+        ventanaChat.addEventListener('pointerup', () => { arrastrandoChat = null; });
+        ventanaChat.addEventListener('pointercancel', () => { arrastrandoChat = null; });
+
+        function agregarMensajeUsuario(texto) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'mensaje-wrapper';
+            wrapper.innerHTML = `<div class="mensaje-usuario">${escaparHtml(texto)}</div>`;
+            mensajes.appendChild(wrapper);
+            scrollAlFinal();
+        }
+
+        function agregarIndicadorCargando() {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'mensaje-wrapper';
+            wrapper.id = 'indicadorCargando';
+            wrapper.innerHTML = `
+                <div class="mensaje-beto-container">
+                    <img src="img/beto.png" alt="" class="avatar-mini">
+                    <div class="mensaje-beto typing-indicator">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                </div>
+            `;
+            mensajes.appendChild(wrapper);
+            scrollAlFinal();
+            return wrapper;
+        }
+
+        function renderizarMarkdown(texto) {
+            if (typeof marked !== 'undefined' && marked.parse) {
+                try {
+                    return marked.parse(texto);
+                } catch (e) {
+                    console.error('Error marked:', e);
+                }
+            }
+            return fallbackMarkdown(texto);
+        }
+
+        function fallbackMarkdown(texto) {
+            let html = escaparHtml(texto);
+            
+            // Format markdown tables if present
+            const lineas = html.split('\n');
+            let enTabla = false;
+            let resultado = [];
+            let tablaHtml = '';
+
+            for (let i = 0; i < lineas.length; i++) {
+                let linea = lineas[i].trim();
+                if (linea.startsWith('|') && linea.endsWith('|')) {
+                    if (linea.includes('---') || linea.includes(':-')) continue; // Skip separator line
+                    const celdas = linea.split('|').slice(1, -1).map(c => c.trim());
+                    if (!enTabla) {
+                        enTabla = true;
+                        tablaHtml = '<table class="tabla-markdown"><thead><tr>';
+                        celdas.forEach(c => tablaHtml += `<th>${c}</th>`);
+                        tablaHtml += '</tr></thead><tbody>';
+                    } else {
+                        tablaHtml += '<tr>';
+                        celdas.forEach(c => tablaHtml += `<td>${c}</td>`);
+                        tablaHtml += '</tr>';
+                    }
+                } else {
+                    if (enTabla) {
+                        tablaHtml += '</tbody></table>';
+                        resultado.push(tablaHtml);
+                        enTabla = false;
+                        tablaHtml = '';
+                    }
+                    resultado.push(linea);
+                }
+            }
+            if (enTabla) {
+                tablaHtml += '</tbody></table>';
+                resultado.push(tablaHtml);
+            }
+
+            html = resultado.join('<br>');
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            html = html.replace(/`(.*?)`/g, '<code>$1</code>');
+            return html;
+        }
+
+        function escaparHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function descargarBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+
+        window.exportarWord = function(mensajeId, titulo = 'Documento_Beto') {
+            const el = document.getElementById(mensajeId);
+            if (!el) return;
+            const clone = el.cloneNode(true);
+            const acciones = clone.querySelector('.acciones-exportar');
+            if (acciones) acciones.remove();
+
+            const fullHtml = `<!DOCTYPE html>
+<html xmlns:o='urn:schemas-microsoft-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+    <meta charset='utf-8'>
+    <title>${escaparHtml(titulo)}</title>
+    <style>
+        body { font-family: 'Calibri', 'Segoe UI', 'Arial', sans-serif; font-size: 11pt; line-height: 1.6; color: #1e293b; margin: 30px; }
+        h1, h2, h3 { color: #1e40af; font-weight: bold; margin-top: 14pt; margin-bottom: 6pt; }
+        h1 { font-size: 18pt; border-bottom: 2px solid #2563eb; padding-bottom: 4pt; }
+        h2 { font-size: 14pt; }
+        h3 { font-size: 12pt; }
+        p { margin-bottom: 8pt; }
+        ul, ol { margin-top: 4pt; margin-bottom: 8pt; padding-left: 20pt; }
+        li { margin-bottom: 3pt; }
+        table { width: 100%; border-collapse: collapse; margin: 12pt 0; }
+        th, td { border: 1px solid #94a3b8; padding: 6pt 10pt; text-align: left; }
+        th { background-color: #2563eb; color: #ffffff; font-weight: bold; }
+        tr:nth-child(even) { background-color: #f8fafc; }
+        code { background-color: #f1f5f9; padding: 2pt 4pt; font-family: monospace; font-size: 10pt; }
+        pre { background-color: #0f172a; color: #f8fafc; padding: 10pt; border-radius: 4pt; font-family: monospace; }
+        blockquote { border-left: 3px solid #2563eb; padding-left: 10pt; color: #475569; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div style="border-bottom: 2px solid #2563eb; padding-bottom: 10px; margin-bottom: 20px;">
+        <h2 style="color: #2563eb; margin: 0; font-size: 16pt;">Asistente Académico Beto — UNEMI</h2>
+        <p style="color: #64748b; font-size: 9pt; margin: 4px 0 0 0;">Documento generado automáticamente</p>
+    </div>
+    ${clone.innerHTML}
+</body>
+</html>`;
+
+            const blob = new Blob(['\ufeff', fullHtml], { type: 'application/msword' });
+            descargarBlob(blob, `${titulo.replace(/\s+/g, '_')}.docx`);
+        };
+
+        window.exportarPDF = function(mensajeId, titulo = 'Documento_Beto') {
+            const el = document.getElementById(mensajeId);
+            if (!el) return;
+            const clone = el.cloneNode(true);
+            const acciones = clone.querySelector('.acciones-exportar');
+            if (acciones) acciones.remove();
+
+            const container = document.createElement('div');
+            container.style.padding = '25px';
+            container.style.fontFamily = "'Plus Jakarta Sans', 'Segoe UI', sans-serif";
+            container.style.color = '#0f172a';
+            container.style.background = '#ffffff';
+
+            container.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid #2563eb; padding-bottom: 12px; margin-bottom: 20px;">
+                    <div>
+                        <h2 style="color: #1e40af; margin: 0; font-size: 20px; font-weight: 700;">Asistente Académico Beto</h2>
+                        <p style="color: #64748b; font-size: 11px; margin: 4px 0 0 0;">Universidad Estatal de Milagro (UNEMI)</p>
+                    </div>
+                </div>
+                <div class="pdf-contenido-body" style="font-size: 13px; line-height: 1.6;">${clone.innerHTML}</div>
+                <div style="margin-top: 35px; border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 10px; color: #94a3b8; text-align: center;">
+                    Documento generado por Asistente Beto IA
+                </div>
+            `;
+
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: `${titulo.replace(/\s+/g, '_')}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, logging: false },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            if (window.html2pdf) {
+                window.html2pdf().set(opt).from(container).save();
+            } else {
+                alert('El generador de PDF se está cargando, por favor intenta en unos segundos.');
+            }
+        };
+
+        window.exportarExcel = function(mensajeId, titulo = 'Datos_Beto') {
+            const el = document.getElementById(mensajeId);
+            if (!el) return;
+            const clone = el.cloneNode(true);
+            const acciones = clone.querySelector('.acciones-exportar');
+            if (acciones) acciones.remove();
+
+            const tables = clone.querySelectorAll('table');
+            if (tables.length > 0 && window.XLSX) {
+                const wb = XLSX.utils.book_new();
+                tables.forEach((tbl, idx) => {
+                    const ws = XLSX.utils.table_to_sheet(tbl);
+                    XLSX.utils.book_append_sheet(wb, ws, `Tabla_${idx + 1}`);
+                });
+                XLSX.writeFile(wb, `${titulo.replace(/\s+/g, '_')}.xlsx`);
+                return;
+            }
+
+            // Fallback: Parse line structures or markdown lists into spreadsheet rows
+            const text = clone.innerText || '';
+            const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+            const rows = [];
+            lines.forEach(line => {
+                if (line.includes('|')) {
+                    const cells = line.split('|').map(c => c.trim()).filter((c, i, a) => !(i === 0 && c === '') && !(i === a.length - 1 && c === ''));
+                    if (cells.length && !line.includes('---')) rows.push(cells);
+                } else if (line.includes(':')) {
+                    const parts = line.replace(/^[*-]\s*/, '').split(/:(.+)/);
+                    if (parts.length >= 2) rows.push([parts[0].trim(), parts[1].trim()]);
+                    else rows.push([line]);
+                } else {
+                    rows.push([line]);
+                }
+            });
+
+            if (window.XLSX && rows.length) {
+                const ws = XLSX.utils.aoa_to_sheet(rows);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Resumen");
+                XLSX.writeFile(wb, `${titulo.replace(/\s+/g, '_')}.xlsx`);
+            } else {
+                alert('No se encontraron tablas ni listas para exportar a Excel.');
+            }
+        };
+
+        window.exportarTexto = function(mensajeId, titulo = 'Documento_Beto') {
+            const el = document.getElementById(mensajeId);
+            if (!el) return;
+            const rawText = el.getAttribute('data-raw-text') || el.innerText;
+            const cleanText = rawText.replace(/(\n\s*){3,}/g, '\n\n').trim();
+            const blob = new Blob([cleanText], { type: 'text/plain;charset=utf-8' });
+            descargarBlob(blob, `${titulo.replace(/\s+/g, '_')}.txt`);
+        };
+
+        function extraerDiapositivas(texto) {
+            const lineas = texto.replace(/\r/g, '').split('\n');
+            const diapositivas = [];
+            let actual = null;
+            let tituloPresentacion = '';
+            const guardar = () => {
+                if (!actual) return;
+                actual.puntos = actual.puntos.filter(Boolean).slice(0, 5);
+                if (actual.titulo || actual.puntos.length) diapositivas.push(actual);
+            };
+
+            lineas.forEach(linea => {
+                const limpia = linea.trim();
+                const titulo = limpia.match(/^#\s+Presentaci[oó]n\s*:\s*(.+)$/i);
+                if (titulo) {
+                    tituloPresentacion = titulo[1].trim();
+                    return;
+                }
+                const encabezado = limpia.match(/^##\s+(?:Diapositiva\s*\d+\s*[:.-]?\s*)?(.+)$/i);
+                if (encabezado) {
+                    guardar();
+                    actual = { titulo: encabezado[1].trim(), puntos: [] };
+                    return;
+                }
+                if (!actual) actual = { titulo: 'Ideas principales', puntos: [] };
+                const punto = limpia.replace(/^[-*•]\s+/, '').replace(/^\d+[.)]\s+/, '').trim();
+                if (punto && !/^\|?\s*[-:]+\s*\|?$/.test(punto) && !/^Diapositiva\s*\d+/i.test(punto)) {
+                    actual.puntos.push(punto.replace(/\*\*/g, ''));
+                }
+            });
+            guardar();
+
+            if (!diapositivas.length) {
+                return { titulo: tituloPresentacion || 'Presentación', diapositivas: [{ titulo: 'Resumen', puntos: texto.split(/[.!?]\s+/).map(item => item.trim()).filter(Boolean).slice(0, 5) }] };
+            }
+            return { titulo: tituloPresentacion || diapositivas[0].titulo || 'Presentación', diapositivas };
+        }
+
+        function normalizarTexto(texto) {
+            return String(texto || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        }
+
+        function consultasDeDiapositiva(diapositiva, contexto = '') {
+            const titulo = String(diapositiva?.titulo || '')
+                .replace(/^\d+[.)\s-]+/, '')
+                .replace(/[^\p{L}\p{N}\s-]/gu, ' ')
+                .trim();
+            const puntos = diapositiva?.puntos || [];
+            const concepto = String(puntos[0] || '')
+                .split(/[:.;!?]/, 1)[0]
+                .replace(/[^\p{L}\p{N}\s-]/gu, ' ')
+                .trim();
+            const tema = String(contexto || '')
+                .replace(/[^\p{L}\p{N}\s-]/gu, ' ')
+                .trim();
+            return [...new Set([
+                `${tema} ${titulo}`.trim(),
+                `${tema} ${concepto}`.trim(),
+                titulo,
+                concepto
+            ].filter(item => item.length >= 4))].slice(0, 3);
+        }
+
+        async function buscarImagenEnInternet(diapositiva, contexto, usadas) {
+            for (const consulta of consultasDeDiapositiva(diapositiva, contexto)) {
+                const endpoint = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(consulta)}&gsrnamespace=6&gsrlimit=8&prop=imageinfo&iiprop=url|mime&iiurlwidth=900&format=json&origin=*`;
+                try {
+                    const respuesta = await fetch(endpoint);
+                    if (!respuesta.ok) continue;
+                    const datos = await respuesta.json();
+                    const paginas = Object.values(datos.query?.pages || {});
+                    const pagina = paginas.find(item => {
+                        const info = item.imageinfo?.[0];
+                        return info && /^image\//.test(info.mime || '') && !usadas.has(info.thumburl || info.url);
+                    });
+                    const imagen = pagina?.imageinfo?.[0]?.thumburl || pagina?.imageinfo?.[0]?.url;
+                    if (imagen) return imagen;
+                } catch (_) {
+                    continue;
+                }
+            }
+            return null;
+        }
+
+        async function asignarImagenes(diapositivas, contexto = '') {
+            const usadas = new Set();
+            for (const diapositiva of diapositivas) {
+            const imagen = await buscarImagenEnInternet(diapositiva, contexto, usadas);
+                diapositiva.imagen = imagen && !usadas.has(imagen) ? imagen : null;
+                if (diapositiva.imagen) usadas.add(diapositiva.imagen);
+            }
+        }
+
+        function dividirPunto(punto) {
+            const partes = punto.split(/:\s*/, 2);
+            const titulo = partes[0].trim();
+            const detalle = (partes[1] || partes[0]).trim();
+            return { titulo: titulo || 'Punto clave', detalle };
+        }
+
+        function crearVisualDeDiapositiva(puntos, indice) {
+            const elementos = puntos.map(dividirPunto);
+            const tipo = indice % 4;
+
+            if (tipo === 1) {
+                return `<div class="slide-card-grid">${elementos.slice(0, 6).map((elemento, posicion) => `
+                    <div class="slide-card-item">
+                        <span class="slide-card-number">${String(posicion + 1).padStart(2, '0')}</span>
+                        <strong>${escaparHtml(elemento.titulo)}</strong>
+                        <span>${escaparHtml(elemento.detalle)}</span>
+                    </div>`).join('')}</div>`;
+            }
+
+            if (tipo === 2) {
+                return `<div class="slide-timeline">${elementos.slice(0, 6).map(elemento => `
+                    <div class="slide-timeline-item">
+                        <span class="slide-timeline-dot" aria-hidden="true"></span>
+                        <div><strong>${escaparHtml(elemento.titulo)}</strong><span>${escaparHtml(elemento.detalle)}</span></div>
+                    </div>`).join('')}</div>`;
+            }
+
+            if (tipo === 3) {
+                return `<div class="slide-bars" aria-label="Gráfico visual de los temas de la diapositiva">${elementos.slice(0, 6).map((elemento, posicion) => {
+                    const ancho = 42 + ((elemento.detalle.length * 7 + posicion * 13) % 49);
+                    return `<div class="slide-bar-row"><strong title="${escaparHtml(elemento.titulo)}">${escaparHtml(elemento.titulo)}</strong><div class="slide-bar-track"><div class="slide-bar-fill" style="width:${ancho}%"></div></div></div>`;
+                }).join('')}</div>`;
+            }
+
+            return `<table class="slide-data-table"><thead><tr><th>Aspecto</th><th>Información</th></tr></thead><tbody>${elementos.slice(0, 6).map(elemento => `
+                <tr><td><strong>${escaparHtml(elemento.titulo)}</strong></td><td>${escaparHtml(elemento.detalle)}</td></tr>`).join('')}</tbody></table>`;
+        }
+
+        function fraseFilosofica(titulo) {
+            const tema = normalizarTexto(titulo);
+            if (/vida|humano|humanidad|sociedad/.test(tema)) return 'Humanismo: comprender la vida también es comprender nuestras relaciones y decisiones.';
+            if (/ciencia|conocimiento|educacion|aprendizaje/.test(tema)) return 'Epistemología: toda pregunta rigurosa transforma la manera en que entendemos el mundo.';
+            if (/historia|cultura|arte/.test(tema)) return 'Memoria y sentido: conocer el pasado permite interpretar el presente con una mirada más crítica.';
+            if (/tecnologia|inteligencia artificial|futuro/.test(tema)) return 'Praxis: una idea adquiere valor cuando se convierte en una acción responsable.';
+            if (/ambiente|naturaleza|clima/.test(tema)) return 'Interdependencia: ningún fenómeno existe aislado de su entorno y sus consecuencias.';
+            return 'Pensamiento crítico: comprender un tema es relacionar sus causas, sus efectos y sus posibilidades.';
+        }
+
+        function crearIlustracionSvg(indice, portada) {
+            const fondo = portada ? '#1c4966' : '#d9e2ec';
+            const primario = indice % 2 ? '#2f80ed' : '#f6bd60';
+            const secundario = indice % 2 ? '#f6bd60' : '#48cae4';
+            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Ilustración conceptual">
+                <circle cx="120" cy="120" r="108" fill="${fondo}"/>
+                <circle cx="178" cy="64" r="26" fill="${secundario}" opacity=".9"/>
+                <path d="M42 166 93 91l35 42 28-29 42 62H42Z" fill="${primario}"/>
+                <rect x="62" y="148" width="116" height="12" rx="6" fill="#fff" opacity=".9"/>
+                <rect x="62" y="174" width="78" height="12" rx="6" fill="#fff" opacity=".55"/>
+                <path d="M74 66h46" stroke="#fff" stroke-width="9" stroke-linecap="round" opacity=".85"/>
+            </svg>`;
+        }
+
+        function svgComoDataUri(svg) {
+            return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
+        }
+
+        function cerrarVistaPresentacion() {
+            document.querySelector('.presentacion-overlay')?.remove();
+        }
+
+        function crearHtmlDiapositiva(diapositiva, indice) {
+            const portada = indice === 0;
+            const puntos = diapositiva.puntos.length ? diapositiva.puntos : [fraseFilosofica(diapositiva.titulo)];
+            const imagen = diapositiva.imagen;
+            const contenido = portada
+                ? `<ul>${puntos.map(punto => `<li>${escaparHtml(punto)}</li>`).join('')}</ul>`
+                : crearVisualDeDiapositiva(puntos, indice);
+            return `<article class="presentacion-slide-html${portada ? ' portada' : ''}${imagen ? ' has-slide-image' : ''}">
+                <div class="slide-brand">UNIVERSIDAD ESTATAL DE MILAGRO <span>• ${portada ? 'PRESENTACIÓN' : 'BETO IA'}</span></div>
+                <div class="slide-kicker">BETO IA &nbsp; / &nbsp; ${String(indice + 1).padStart(2, '0')}</div>
+                <h2>${escaparHtml(diapositiva.titulo || 'Presentación')}</h2>
+                <div class="slide-panel visual-panel">${contenido}</div>
+                ${imagen ? `<img class="slide-foto" src="${imagen}" alt="Imagen relacionada con ${escaparHtml(diapositiva.titulo || 'el tema')}" onerror="this.remove();">` : ''}
+                <div class="slide-footer">ASISTENTE ACADÉMICO BETO &nbsp; • &nbsp; UNEMI <span style="margin-left:18px">${String(indice + 1).padStart(2, '0')}</span></div>
+            </article>`;
+        }
+
+        window.abrirVistaPresentacion = async function(mensajeId, titulo = 'Presentacion_Beto') {
+            const el = document.getElementById(mensajeId);
+            if (!el) return;
+            const texto = el.getAttribute('data-raw-text') || el.innerText || '';
+            const extraidas = extraerDiapositivas(texto);
+            const diapositivas = extraidas.diapositivas;
+            const tituloPresentacion = extraidas.titulo || titulo;
+            const portada = diapositivas[0];
+            if (portada) {
+                if (/^(ideas principales|resumen)$/i.test(portada.titulo)) portada.titulo = tituloPresentacion;
+                if (portada.puntos.length < 4) {
+                    const agenda = diapositivas.slice(1, 5).map((diapositiva, indice) => `Tema ${indice + 1}: ${diapositiva.titulo}`);
+                    portada.puntos = [...new Set([...portada.puntos, ...agenda])].slice(0, 5);
+                }
+            }
+            await asignarImagenes(diapositivas, tituloPresentacion);
+            window.presentacionPendiente = { diapositivas, titulo: tituloPresentacion };
+            cerrarVistaPresentacion();
+            const overlay = document.createElement('div');
+            overlay.className = 'presentacion-overlay';
+            overlay.innerHTML = `<div class="presentacion-toolbar">
+                <div><strong>${escaparHtml(tituloPresentacion.replace(/_/g, ' '))}</strong><br><span>${diapositivas.length} diapositivas listas para revisar</span></div>
+                <div class="presentacion-toolbar-actions">
+                    <button type="button" onclick="cerrarVistaPresentacion()">Cerrar</button>
+                    <button type="button" onclick="descargarPresentacionPDF()">Descargar PDF visual</button>
+                    <button type="button" onclick="descargarPresentacion()">Descargar PowerPoint</button>
+                </div>
+            </div><main class="presentacion-slides">${diapositivas.map(crearHtmlDiapositiva).join('')}</main>`;
+            document.body.appendChild(overlay);
+        };
+
+        window.descargarPresentacionPDF = async function() {
+            const pendiente = window.presentacionPendiente;
+            if (!pendiente || !window.html2pdf) {
+                alert('El exportador PDF se está cargando, por favor intenta en unos segundos.');
+                return;
+            }
+            const contenedor = document.createElement('main');
+            contenedor.className = 'presentacion-pdf-export';
+            contenedor.innerHTML = pendiente.diapositivas.map(crearHtmlDiapositiva).join('');
+            document.body.appendChild(contenedor);
+            try {
+                await window.html2pdf().set({
+                    margin: 0,
+                    filename: `${pendiente.titulo.replace(/\s+/g, '_')}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#f7f9fe' },
+                    jsPDF: { unit: 'px', format: [1180, 664], orientation: 'landscape' },
+                    pagebreak: { mode: ['css', 'legacy'] }
+                }).from(contenedor).save();
+            } finally {
+                contenedor.remove();
+            }
+        };
+
+        window.descargarPresentacion = async function() {
+            const PptxGenJS = window.PptxGenJS || window.pptxgen;
+            const pendiente = window.presentacionPendiente;
+            if (!PptxGenJS || !pendiente) {
+                alert('El exportador de PowerPoint se está cargando, por favor intenta en unos segundos.');
+                return;
+            }
+            const pptx = new PptxGenJS();
+            pptx.layout = 'LAYOUT_WIDE';
+            pptx.author = 'Beto IA';
+            pptx.subject = 'Presentación académica';
+            pptx.title = pendiente.titulo;
+            pptx.company = 'UNEMI';
+            pptx.lang = 'es-ES';
+            pptx.theme = { headFontFace: 'Montserrat', bodyFontFace: 'Poppins', lang: 'es-ES' };
+            const obtenerImagenComoDataUri = async (url) => {
+                try {
+                    const respuesta = await fetch(url, { mode: 'cors' });
+                    if (!respuesta.ok) throw new Error('No se pudo descargar la imagen.');
+                    const bytes = new Uint8Array(await respuesta.arrayBuffer());
+                    let binario = '';
+                    bytes.forEach(byte => binario += String.fromCharCode(byte));
+                    return `data:${respuesta.headers.get('Content-Type') || 'image/jpeg'};base64,${btoa(binario)}`;
+                } catch (_) {
+                    return null;
+                }
+            };
+            for (const [indice, diapositiva] of pendiente.diapositivas.entries()) {
+                const portada = indice === 0;
+                const slide = pptx.addSlide();
+                slide.background = { color: 'F7F9FE' };
+                const segmentos = [
+                    { x: 0, w: 3.6, color: '0A2345' },
+                    { x: 3.6, w: 3, color: '3C8DFF' },
+                    { x: 6.6, w: 2.75, color: 'F5822A' },
+                    { x: 9.35, w: 3.15, color: 'FF7BBF' }
+                ];
+                segmentos.forEach(segmento => slide.addShape(pptx.ShapeType.rect, { x: segmento.x, y: 0, w: segmento.w, h: 0.12, line: { color: segmento.color, transparency: 100 }, fill: { color: segmento.color } }));
+                slide.addText(`UNIVERSIDAD ESTATAL DE MILAGRO  •  ${portada ? 'PRESENTACIÓN' : 'BETO IA'}`, { x: 0.7, y: 0.38, w: 7, h: 0.25, fontFace: 'Poppins', fontSize: 10, bold: true, color: '0A5CB3', charSpacing: 0.7, margin: 0 });
+                slide.addText(`BETO IA  /  ${String(indice + 1).padStart(2, '0')}`, { x: 0.7, y: 0.76, w: 4.8, h: 0.25, fontFace: 'Poppins', fontSize: 9, bold: true, color: 'F5822A', charSpacing: 1.2, margin: 0 });
+                slide.addText(diapositiva.titulo || 'Presentación', { x: 0.7, y: 1.12, w: portada ? 5.8 : 10.9, h: 1.05, fontFace: 'Montserrat', fontSize: portada ? 32 : 28, bold: true, color: '0A2345', margin: 0, fit: 'shrink' });
+                const puntos = diapositiva.puntos.length ? diapositiva.puntos : [fraseFilosofica(diapositiva.titulo)];
+                slide.addShape(pptx.ShapeType.rect, { x: 0.7, y: portada ? 2.35 : 2.28, w: portada ? 6 : 11.2, h: portada ? 3.45 : 3.65, line: { color: 'DCE8F5', width: 1 }, fill: { color: 'FFFFFF', transparency: 3 } });
+                slide.addShape(pptx.ShapeType.rect, { x: 0.7, y: portada ? 2.35 : 2.28, w: portada ? 6 : 11.2, h: 0.08, line: { color: '3C8DFF', transparency: 100 }, fill: { color: '3C8DFF' } });
+                if (portada) {
+                    slide.addText(puntos.map(punto => ({ text: punto, options: { bullet: { indent: 16 }, hanging: 4 } })), { x: 0.98, y: 2.65, w: 5.35, h: 2.85, fontFace: 'Poppins', fontSize: 17, color: '1D2C44', breakLine: true, valign: 'mid', paraSpaceAfterPt: 13, margin: 0.08, fit: 'shrink' });
+                } else if (indice % 4 === 1) {
+                    puntos.slice(0, 6).forEach((punto, posicion) => {
+                        const columna = posicion % 3;
+                        const fila = Math.floor(posicion / 3);
+                        const partes = punto.split(/:\s*/, 2);
+                        const tituloPunto = partes[0].trim() || 'Punto clave';
+                        const detallePunto = (partes[1] || partes[0]).trim();
+                        const x = 0.98 + columna * 3.48;
+                        const y = 2.68 + fila * 1.42;
+                        slide.addShape(pptx.ShapeType.rect, { x, y, w: 3.15, h: 1.12, line: { color: 'DCE8F5', width: 1 }, fill: { color: fila % 2 ? 'F4F9FF' : 'FFFFFF' } });
+                        slide.addText(String(posicion + 1).padStart(2, '0'), { x: x + 0.14, y: y + 0.12, w: 0.45, h: 0.2, fontFace: 'Montserrat', fontSize: 14, bold: true, color: 'F5822A', margin: 0 });
+                        slide.addText(tituloPunto, { x: x + 0.65, y: y + 0.12, w: 2.3, h: 0.25, fontFace: 'Montserrat', fontSize: 11, bold: true, color: '0A2345', fit: 'shrink', margin: 0 });
+                        slide.addText(detallePunto, { x: x + 0.14, y: y + 0.46, w: 2.8, h: 0.5, fontFace: 'Poppins', fontSize: 9, color: '5D728D', fit: 'shrink', margin: 0 });
+                    });
+                } else if (indice % 4 === 2) {
+                    puntos.slice(0, 6).forEach((punto, posicion) => {
+                        const partes = punto.split(/:\s*/, 2);
+                        const tituloPunto = partes[0].trim() || 'Punto clave';
+                        const detallePunto = (partes[1] || partes[0]).trim();
+                        const y = 2.68 + posicion * 0.52;
+                        if (posicion < puntos.length - 1) slide.addShape(pptx.ShapeType.line, { x: 1.08, y: y + 0.15, w: 0, h: 0.52, line: { color: 'B8D7F7', width: 1.5 } });
+                        slide.addShape(pptx.ShapeType.ellipse, { x: 0.98, y, w: 0.2, h: 0.2, line: { color: posicion % 2 ? 'F5822A' : '3C8DFF', width: 2 }, fill: { color: 'FFFFFF' } });
+                        slide.addText(tituloPunto, { x: 1.42, y: y - 0.02, w: 2.3, h: 0.18, fontFace: 'Montserrat', fontSize: 10, bold: true, color: '0A2345', margin: 0 });
+                        slide.addText(detallePunto, { x: 3.75, y: y - 0.02, w: 7.3, h: 0.22, fontFace: 'Poppins', fontSize: 9, color: '5D728D', fit: 'shrink', margin: 0 });
+                    });
+                } else if (indice % 4 === 3) {
+                    puntos.slice(0, 6).forEach((punto, posicion) => {
+                        const partes = punto.split(/:\s*/, 2);
+                        const tituloPunto = partes[0].trim() || 'Punto clave';
+                        const ancho = 3.7 + ((punto.length * 7 + posicion * 13) % 5.2);
+                        const y = 2.72 + posicion * 0.48;
+                        slide.addText(tituloPunto, { x: 0.98, y, w: 2.1, h: 0.18, fontFace: 'Poppins', fontSize: 10, bold: true, color: '0A2345', fit: 'shrink', margin: 0 });
+                        slide.addShape(pptx.ShapeType.rect, { x: 3.25, y: y + 0.03, w: 7.5, h: 0.13, line: { color: 'E5EEF8', transparency: 100 }, fill: { color: 'E5EEF8' } });
+                        slide.addShape(pptx.ShapeType.rect, { x: 3.25, y: y + 0.03, w: ancho, h: 0.13, line: { color: '7B61FF', transparency: 100 }, fill: { color: '7B61FF' } });
+                    });
+                } else {
+                    const filas = [['Aspecto', 'Información'], ...puntos.slice(0, 5).map(punto => {
+                        const partes = punto.split(/:\s*/, 2);
+                        return [partes[0].trim() || 'Punto clave', (partes[1] || partes[0]).trim()];
+                    })];
+                    slide.addTable(filas, { x: 0.98, y: 2.58, w: 10.55, h: 2.9, border: { type: 'solid', color: 'DCE8F5', pt: 1 }, fill: 'FFFFFF', color: '334E68', fontFace: 'Poppins', fontSize: 10, margin: 0.08, rowH: 0.42, bold: false, autoFit: false, colW: [2.35, 8.2], fit: 'shrink' });
+                }
+                if (portada && diapositiva.imagen) {
+                    const imagen = await obtenerImagenComoDataUri(diapositiva.imagen);
+                    if (imagen) slide.addImage({ data: imagen, x: 8.15, y: 1.78, w: 3.85, h: 3.75 });
+                }
+                slide.addShape(pptx.ShapeType.line, { x: 0.7, y: 6.82, w: 11.9, h: 0, line: { color: 'CBD5E1', width: 1 } });
+                slide.addText('Asistente académico Beto  •  UNEMI', { x: 0.7, y: 6.98, w: 5, h: 0.2, fontFace: 'Poppins', fontSize: 9, color: '7D8CA0', margin: 0 });
+                slide.addText(String(indice + 1).padStart(2, '0'), { x: 11.35, y: 6.98, w: 0.6, h: 0.2, fontFace: 'Poppins', fontSize: 9, bold: true, color: '7D8CA0', align: 'right', margin: 0 });
+            }
+            await pptx.writeFile({ fileName: `${pendiente.titulo.replace(/\s+/g, '_')}.pptx` });
+        };
+
+        window.exportarPowerPoint = window.abrirVistaPresentacion;
+
+        function agregarMensajeBeto(texto, esError = false) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'mensaje-wrapper';
+            const claseBeto = esError ? 'mensaje-beto mensaje-error' : 'mensaje-beto';
+            const contenidoHtml = esError ? escaparHtml(texto) : renderizarMarkdown(texto);
+            const mensajeId = `msg_beto_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+            
+            const barraAcciones = esError ? '' : `
+                <div class="acciones-exportar">
+                    <span class="etiqueta-exportar">📥 Exportar:</span>
+                    <button type="button" class="btn-exportar btn-exportar-word" onclick="exportarWord('${mensajeId}', 'Documento_Beto')" title="Descargar como Word (.docx)">
+                        📄 Word
+                    </button>
+                    <button type="button" class="btn-exportar btn-exportar-pdf" onclick="exportarPDF('${mensajeId}', 'Documento_Beto')" title="Descargar como PDF (.pdf)">
+                        📕 PDF
+                    </button>
+                    <button type="button" class="btn-exportar btn-exportar-excel" onclick="exportarExcel('${mensajeId}', 'Datos_Beto')" title="Descargar como Excel (.xlsx)">
+                        📊 Excel
+                    </button>
+                    <button type="button" class="btn-exportar btn-exportar-txt" onclick="exportarTexto('${mensajeId}', 'Notas_Beto')" title="Descargar como Texto (.txt)">
+                        📝 Texto
+                    </button>
+                    <button type="button" class="btn-exportar btn-exportar-pptx" onclick="abrirVistaPresentacion('${mensajeId}', 'Presentacion_Beto')" title="Ver y descargar presentación PowerPoint (.pptx)">
+                        🎞️ Ver presentación
+                    </button>
+                </div>
+            `;
+
+            wrapper.innerHTML = `
+                <div class="mensaje-beto-container">
+                    <img src="img/beto.png" alt="" class="avatar-mini">
+                    <div class="${claseBeto}" id="${mensajeId}" data-raw-text="${escaparHtml(texto)}">
+                        ${contenidoHtml}
+                        ${barraAcciones}
+                    </div>
+                </div>
+            `;
+            mensajes.appendChild(wrapper);
+            wrapper.querySelectorAll('a[href]').forEach(enlace => {
+                try {
+                    const url = new URL(enlace.href, window.location.href);
+                    if (url.hostname.endsWith('unemi.edu.ec')) {
+                        enlace.target = '_blank';
+                        enlace.rel = 'noopener noreferrer';
+                        enlace.title = 'Abrir en Moodle con tu sesión institucional';
+                    }
+                } catch (_) {
+                    // Ignora enlaces con formato no válido.
+                }
+            });
+            scrollAlFinal();
+        }
+
+        function removerCargando() {
+            const el = document.getElementById('indicadorCargando');
+            if (el) el.remove();
+        }
+
+        function scrollAlFinal() {
+            mensajes.scrollTo({
+                top: mensajes.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        function prepararBotonCancelar() {
+            botonEnviar.classList.add('cancelando');
+            botonEnviar.setAttribute('aria-label', 'Cancelar operación');
+            botonEnviar.title = 'Cancelar operación';
+            botonEnviar.innerHTML = '<span aria-hidden="true">&times;</span>';
+        }
+
+        function restaurarBotonEnviar() {
+            controladorSolicitud = null;
+            botonEnviar.classList.remove('cancelando');
+            botonEnviar.setAttribute('aria-label', 'Enviar mensaje');
+            botonEnviar.title = '';
+            botonEnviar.innerHTML = '<img src="img/enviar.png" alt="Enviar">';
+        }
+
+        async function procesarVideoDelSitio(pregunta) {
+            const videos = Array.isArray(window.webContext?.page?.videos)
+                ? window.webContext.page.videos
+                : [];
+            
+            // Si la consulta menciona presentaciones, diapositivas o documentos, procesar con el chat normal
+            const esDocumentoOPresentacion = /(diapositiva|presentacion|powerpoint|pptx|slide|documento|pdf|word|archivo)/i.test(pregunta);
+            if (esDocumentoOPresentacion) return false;
+
+            // Solo activar la transcripción de video si hay un video real en la página y se pide explícitamente video/audio
+            const solicitaVideoExplicitamente = /(video|grabacion|magistral|audio|transcrip)/i.test(pregunta);
+            if (!solicitaVideoExplicitamente || !videos.length) return false;
+
+            agregarMensajeUsuario(pregunta);
+            mensajeInput.value = '';
+            mensajeInput.disabled = true;
+
+            const video = videos[0] || { titulo: 'Clase Magistral 1', url: 'https://unemi.edu.ec' };
+            const videoUrl = new URL(video.url, window.webContext?.site?.origin || window.location.href);
+
+            agregarIndicadorCargando();
+            animarBeto('hablando');
+
+            // Intento 1: Si Beto se ejecuta dentro de la extensión del navegador, usa la sesión activa del estudiante
+            if (window.parent !== window) {
+                try {
+                    const resultadoExtension = await new Promise((resolve, reject) => {
+                        const requestId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+                        solicitudesVideo.set(requestId, resolve);
+                        const cancelar = () => {
+                            solicitudesVideo.delete(requestId);
+                            reject(new DOMException('Operación cancelada', 'AbortError'));
+                        };
+                        controladorSolicitud.signal.addEventListener('abort', cancelar, { once: true });
+                        window.parent.postMessage({
+                            type: 'beto:request-video-summary',
+                            requestId,
+                            video: { url: videoUrl.href, title: video.titulo || 'video-moodle.mp4' }
+                        }, '*');
+
+                        // Timeout de 15 segundos para la extensión
+                        window.setTimeout(() => {
+                            if (!solicitudesVideo.has(requestId)) return;
+                            solicitudesVideo.delete(requestId);
+                            resolve(null);
+                        }, 15000);
+                    });
+
+                    if (resultadoExtension && !resultadoExtension.error) {
+                        removerCargando();
+                        agregarMensajeBeto(`## 🎥 Resumen de ${resultadoExtension.filename || video.titulo}\n\n${resultadoExtension.summary}\n\n<details><summary>Ver transcripción completa</summary>\n\n${resultadoExtension.transcript}\n\n</details>`);
+                        animarBeto('');
+                        mensajeInput.disabled = false;
+                        mensajeInput.focus();
+                        restaurarBotonEnviar();
+                        return true;
+                    }
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        removerCargando();
+                        animarBeto('');
+                        mensajeInput.disabled = false;
+                        mensajeInput.focus();
+                        restaurarBotonEnviar();
+                        return true;
+                    }
+                    // Si falla la extensión, pasa a las siguientes opciones
+                }
+            }
+
+            // Intento 2: Si el video requiere autenticación y no hay extensión instalada
+            const isAuthVideo = /unemi\.edu\.ec|drive\.google|kaltura|panopto|microsoftstream/i.test(video.url);
+            if (isAuthVideo) {
+                removerCargando();
+                agregarMensajeBeto(`🔒 **Acceso Institucional UNEMI**\n\nVideo detectado: **${video.titulo}**\n\nPara que Beto ingrese automáticamente a tus clases sin tener que subir archivos manualmente, existen **2 formas de dar autorización**:\n\n1. **🧩 Usar la Extensión Oficial de Beto (Recomendado)**: Con la extensión cargada en tu navegador, Beto usará automáticamente tu sesión iniciada de UNEMI sin pedir contraseñas.\n2. **🎥 Subir archivo de la clase**: Si no tienes la extensión instalada, puedes descargar el video o audio y subirlo con el botón **🎥**.\n3. **📝 Pegar transcripción**: Pegar los subtítulos o notas de la clase directamente aquí.`);
+                mensajeInput.disabled = false;
+                mensajeInput.focus();
+                restaurarBotonEnviar();
+                return true;
+            }
+
+            // Intento 3: Intentar servidor backend para videos públicos
+            try {
+                const respuesta = await fetch('/api/transcribe-video-url', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: controladorSolicitud.signal,
+                    body: JSON.stringify({ url: videoUrl.href, title: video.titulo || 'Video de clase' })
+                });
+                const resultado = await respuesta.json();
+                removerCargando();
+
+                if (!respuesta.ok) {
+                    agregarMensajeBeto(`${resultado.error || 'No se pudo procesar el video público.'}\n\nTip: Con la extensión de Beto o el botón **🎥** podrás procesarlo sin problemas.`, true);
+                } else {
+                    agregarMensajeBeto(`## 🎥 Resumen de ${resultado.filename}\n\n${resultado.summary}\n\n<details><summary>Ver transcripción completa</summary>\n\n${resultado.transcript}\n\n</details>`);
+                }
+            } catch (error) {
+                removerCargando();
+                if (error.name !== 'AbortError') {
+                    agregarMensajeBeto('🔒 Este video pertenece al aula virtual de UNEMI. Para que Beto lo procese automáticamente con tu sesión activa, activa la Extensión de Beto o sube el archivo con el botón 🎥.', true);
+                }
+            } finally {
+                animarBeto('');
+                mensajeInput.disabled = false;
+                mensajeInput.focus();
+                restaurarBotonEnviar();
+            }
+            return true;
+        }
+
+
+        async function procesarRecursoMoodleSiEsNecesario(texto) {
+            if (window.parent === window || !texto) return null;
+            
+            // Buscar si el mensaje contiene una URL de Moodle /mod/ o si coincide con algún recurso detectado en la página
+            const modMatch = texto.match(/https?:\/\/[^\s"']+\/mod\/(?:url|resource|page|folder)\/view\.php\?[^\s"']+/i);
+            let targetUrl = modMatch ? modMatch[0] : null;
+
+            if (!targetUrl && /(resumen|explica|clase|tema|unidad|presentacion|diapositiva|material)/i.test(texto)) {
+                const links = window.webContext?.page?.links || [];
+                const tasks = window.webContext?.course?.tasks || [];
+                const candidate = [...links, ...tasks].find(item =>
+                    /mod\/(?:url|resource|page)\/view\.php/i.test(item.url)
+                );
+                if (candidate) targetUrl = candidate.url;
+            }
+
+            if (!targetUrl) return null;
+
+            try {
+                const requestId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+                const resultado = await new Promise(resolve => {
+                    const timer = setTimeout(() => {
+                        solicitudesMoodleResource.delete(requestId);
+                        resolve(null);
+                    }, 10000);
+                    solicitudesMoodleResource.set(requestId, (data) => {
+                        clearTimeout(timer);
+                        resolve(data);
+                    });
+                    window.parent.postMessage({
+                        type: 'beto:request-moodle-resource',
+                        requestId,
+                        url: targetUrl
+                    }, '*');
+                });
+                return resultado;
+            } catch (_) {
+                return null;
+            }
+        }
+
+        async function procesarMensaje(texto) {
+            if (!texto && !contenidosArchivos.length) return;
+            if (controladorSolicitud) return;
+            controladorSolicitud = new AbortController();
+            mensajeInput.disabled = true;
+            prepararBotonCancelar();
+            if (texto && await procesarVideoDelSitio(texto)) return;
+
+            const recursoExtra = await procesarRecursoMoodleSiEsNecesario(texto);
+            let contextoAdicional = '';
+            if (recursoExtra && recursoExtra.text) {
+                contextoAdicional = `\n\nContenido extraído automáticamente del recurso de Moodle "${recursoExtra.title || 'Recurso'}":\n${recursoExtra.text}`;
+            }
+
+            const limiteCaracteres = 14000;
+            const contextoParaEnviar = (contextoPagina + contextoAdicional)
+                ? `\n\nContexto de la página del curso:\n${contextoPagina}${contextoAdicional}`
+                : '';
+            const limitePorDocumento = Math.floor(13000 / (contenidosArchivos.length || 1));
+            const documentos = contenidosArchivos.map((contenido, indice) =>
+                `Documento "${archivosSeleccionados[indice].name}":\n${contenido.slice(0, limitePorDocumento)}${contenido.length > limitePorDocumento ? '\n[Parte restante omitida.]' : ''}`
+            ).join('\n\n');
+            const contenidoParaEnviar = documentos.slice(0, limiteCaracteres);
+            const textoParaEnviar = contenidosArchivos.length
+                ? `Analiza los siguientes documentos y responde a mi solicitud.${contextoParaEnviar}\n\n${contenidoParaEnviar}\n\nSolicitud: ${texto || 'Resume y explica los documentos.'}`
+                : `${contextoParaEnviar}\n\nSolicitud: ${texto}`;
+            const esResumenDeReunion = textoParaEnviar.includes('secretario ejecutivo');
+            const solicitaPresentacion = /(presentaci[oó]n|diapositiva|powerpoint|pptx|slide)/i.test(textoParaEnviar);
+            const instruccionesMejora = esResumenDeReunion
+                ? '\n\nEl resultado debe ser un informe largo, completo y bien desarrollado, no un resumen de pocas líneas. Desarrolla cada tema con contexto, argumentos, resultado y evidencia encontrada en la transcripción. Mantén un nivel profesional y listo para entregar o compartir. Además del resumen, incluye una sección "## Mejoras y recomendaciones" con propuestas concretas para mejorar procesos, comunicación, coordinación, tiempos, calidad y resultados. Para cada propuesta usa una tabla con: Mejora sugerida | Problema que resuelve | Beneficio esperado | Prioridad | Esfuerzo estimado | Primer paso. Distingue las recomendaciones que se desprenden de la reunión de las ideas nuevas que propones. Añade una sección "## Plan de seguimiento" con acciones para 24 horas, 7 días y 30 días, y una sección "## Indicadores sugeridos" con métricas para comprobar si las mejoras funcionan. No presentes una sugerencia como una decisión tomada. Incluye todos los puntos relevantes aunque la respuesta sea extensa; evita repetir frases vacías y prioriza información útil.\n'
+                : '';
+            const instruccionesPresentacion = solicitaPresentacion || esResumenDeReunion
+                ? '\n\nFORMATO DE PRESENTACION: además del contenido principal, prepara una versión completa y lista para exportar a PowerPoint. Usa exactamente un encabezado "# Presentación: [título]" y después entre 8 y 10 bloques con encabezados "## Diapositiva 1: [título]", "## Diapositiva 2: [título]", etc. Desarrolla el tema con profundidad académica: contexto, definición de conceptos, antecedentes, causas o proceso, ejemplos concretos, aplicaciones, comparación de perspectivas, evidencias disponibles, limitaciones, riesgos, recomendaciones accionables y conclusión. En cada diapositiva incluye de 4 a 7 viñetas claras; cada viñeta debe ser una o dos frases completas y aportar información específica. Distribuye el contenido para que no se repita: incluye contexto, conceptos, desarrollo, caso o ejemplo, análisis, aplicaciones, riesgos, recomendaciones y cierre. No pongas tablas dentro de las diapositivas, no uses frases vacías y no inventes datos; si falta información escribe "No especificado".\n'
+                : '';
+
+            // Ocultar chips de sugerencias tras la primera interacción
+            if (sugerencias) {
+                sugerencias.style.display = 'none';
+            }
+
+            const nombresArchivos = archivosSeleccionados.map(archivo => archivo.name).join(', ');
+            agregarMensajeUsuario(texto || `Analizar documentos: ${nombresArchivos}`);
+            mensajeInput.value = '';
+            mensajeInput.disabled = true;
+
+            const cargandoWrapper = agregarIndicadorCargando();
+            animarBeto('hablando');
+
+            try {
+                const respuesta = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: controladorSolicitud.signal,
+                    body: JSON.stringify({
+                        messages: [{ role: 'user', content: textoParaEnviar + instruccionesMejora + instruccionesPresentacion }]
+                    })
+                });
+
+                removerCargando();
+                const datos = await respuesta.json();
+
+                if (!respuesta.ok) {
+                    agregarMensajeBeto(datos.error || 'No se pudo conectar con el servidor.', true);
+                } else {
+                    agregarMensajeBeto(datos.reply || 'No recibí una respuesta.');
+                }
+            } catch (error) {
+                removerCargando();
+                if (error.name !== 'AbortError') {
+                    agregarMensajeBeto('No pude conectarme al servidor. Verifica que el servidor esté iniciado.', true);
+                }
+            } finally {
+                animarBeto('');
+                restaurarBotonEnviar();
+                mensajeInput.disabled = false;
+                mensajeInput.focus();
+            }
+        }
+
+        botonEnviar.addEventListener('click', (event) => {
+            if (controladorSolicitud) {
+                event.preventDefault();
+                controladorSolicitud.abort();
+            }
+        });
+
+        formulario.addEventListener('submit', (event) => {
+            event.preventDefault();
+            if (controladorSolicitud) return;
+            const texto = mensajeInput.value.trim();
+            procesarMensaje(texto);
+        });
+
+        window.enviarSugerencia = function(texto) {
+            procesarMensaje(texto);
+        };
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') cambiarChat(false);
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.asistente')) cambiarChat(false);
+        });
+        
+    </script>
+</body>
+</html>

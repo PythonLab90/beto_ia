@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Beto para Moodle UNEMI",
+  "version": "1.6.0",
+  "description": "Asistente Beto para Capacitación Docente UNEMI.",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://capacitaciondocente.unemi.edu.ec/*",
+        "http://capacitaciondocente.unemi.edu.ec/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://capacitaciondocente.unemi.edu.ec/*",
+    "http://capacitaciondocente.unemi.edu.ec/*",
+    "https://recoup-outpost-poise.ngrok-free.dev/*"
+  ],
+  "action": {
+    "default_title": "Beto para Moodle"
+  }
+}
