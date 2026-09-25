@@ -24,6 +24,6 @@ La contraseña nunca se envía a Beto. El video debe aparecer como un elemento d
 
 ## Importante
 
-La extensión depende de que el túnel de ngrok esté encendido. Si ngrok muestra su página de advertencia, abre primero `https://recoup-outpost-poise.ngrok-free.dev/` y pulsa **Visit Site**.
+La extensión utiliza el servidor público de Render en `https://beto-ia-3.onrender.com/`. El servicio gratuito puede tardar unos segundos en despertar después de un periodo sin uso.
 
 Para que todos los estudiantes vean Beto sin instalar la extensión, hace falta agregar la integración en Moodle mediante un bloque HTML, el tema o un plugin con permisos administrativos.

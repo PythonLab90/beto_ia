@@ -22,7 +22,7 @@
   "host_permissions": [
     "https://capacitaciondocente.unemi.edu.ec/*",
     "http://capacitaciondocente.unemi.edu.ec/*",
-    "https://recoup-outpost-poise.ngrok-free.dev/*"
+    "https://beto-ia-3.onrender.com/*"
   ],
   "action": {
     "default_title": "Beto para Moodle"

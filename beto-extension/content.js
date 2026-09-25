@@ -1,7 +1,7 @@
 (() => {
     'use strict';
 
-    const CHATBOT_ORIGIN = 'https://recoup-outpost-poise.ngrok-free.dev';
+    const CHATBOT_ORIGIN = 'https://beto-ia-3.onrender.com';
     const ROOT_ID = 'beto-extension-root';
     let iframe;
     let lastContext = '';

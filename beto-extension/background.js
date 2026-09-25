@@ -1,4 +1,4 @@
-const DEFAULT_CHATBOT_ORIGIN = 'http://localhost:3000';
+const DEFAULT_CHATBOT_ORIGIN = 'https://beto-ia-3.onrender.com';
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message?.type === 'beto:fetch-moodle-resource') {
