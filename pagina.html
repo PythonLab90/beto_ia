@@ -1433,10 +1433,11 @@
             // Actualizar banner de Moodle si se detecta curso
             const bannerCurso = document.getElementById('bannerCurso');
             const nombreCursoDetectado = document.getElementById('nombreCursoDetectado');
-            if (bannerCurso && nombreCursoDetectado && contenido.course?.title) {
-                const tituloCurso = contenido.course.title;
-                const seccion = contenido.course.section ? ` - ${contenido.course.section}` : '';
-                nombreCursoDetectado.textContent = `${tituloCurso}${seccion}`;
+            if (bannerCurso && nombreCursoDetectado && (contenido.course?.title || contenido.course?.activity)) {
+                const tituloCurso = contenido.course.title || 'Moodle UNEMI';
+                const seccion = contenido.course.section ? ` / ${contenido.course.section}` : '';
+                const actividad = contenido.course.activity ? ` / Viendo: ${contenido.course.activity}` : '';
+                nombreCursoDetectado.textContent = `${tituloCurso}${seccion}${actividad}`;
                 bannerCurso.style.display = 'flex';
             }
 
@@ -1468,6 +1469,7 @@
             contextoPagina = [
                 contenido.course?.title ? `Curso actual: ${contenido.course.title}` : '',
                 contenido.course?.section ? `Sección/Tema: ${contenido.course.section}` : '',
+                contenido.course?.activity ? `Actividad actual: ${contenido.course.activity}` : '',
                 `Sitio: ${contenido.site.title || ''}`,
                 `URL: ${contenido.site.url || ''}`,
                 contenido.page.text || '',
@@ -2739,8 +2741,13 @@
             const textoParaEnviar = contenidosArchivos.length
                 ? `Analiza los siguientes documentos y responde a mi solicitud.${contextoParaEnviar}\n\n${contenidoParaEnviar}\n\nSolicitud: ${texto || 'Resume y explica los documentos.'}`
                 : `${contextoParaEnviar}\n\nSolicitud: ${texto}`;
-            const esResumenDeReunion = textoParaEnviar.includes('secretario ejecutivo');
-            const solicitaPresentacion = /(presentaci[oó]n|diapositiva|powerpoint|pptx|slide)/i.test(textoParaEnviar);
+            const esResumenDeReunion = /secretario ejecutivo/i.test(texto);
+            const rechazaPresentacion = /\bno\s+(?:quiero|necesito|hagas?|generes?|crees?|diseñes?|prepares?)\b/i.test(texto);
+            const solicitaPresentacion = !rechazaPresentacion && (
+                /\b(?:cre\w*|gener\w*|prepar\w*|diseñ\w*|elabor\w*|arm\w*|hac\w*|haz\w*|export\w*|convert\w*)\b[\s\S]{0,80}\b(?:presentaci[oó]n|diapositivas?|powerpoint|pptx|slides?)\b/i.test(texto)
+                || /^\s*(?:una?\s+)?(?:presentaci[oó]n|diapositivas?|powerpoint|pptx|slides?)\b/i.test(texto)
+                || /\b(?:quiero|necesito)\b[\s\S]{0,30}\b(?:presentaci[oó]n|diapositivas?|powerpoint|pptx|slides?)\b/i.test(texto)
+            );
             const instruccionesMejora = esResumenDeReunion
                 ? '\n\nEl resultado debe ser un informe largo, completo y bien desarrollado, no un resumen de pocas líneas. Desarrolla cada tema con contexto, argumentos, resultado y evidencia encontrada en la transcripción. Mantén un nivel profesional y listo para entregar o compartir. Además del resumen, incluye una sección "## Mejoras y recomendaciones" con propuestas concretas para mejorar procesos, comunicación, coordinación, tiempos, calidad y resultados. Para cada propuesta usa una tabla con: Mejora sugerida | Problema que resuelve | Beneficio esperado | Prioridad | Esfuerzo estimado | Primer paso. Distingue las recomendaciones que se desprenden de la reunión de las ideas nuevas que propones. Añade una sección "## Plan de seguimiento" con acciones para 24 horas, 7 días y 30 días, y una sección "## Indicadores sugeridos" con métricas para comprobar si las mejoras funcionan. No presentes una sugerencia como una decisión tomada. Incluye todos los puntos relevantes aunque la respuesta sea extensa; evita repetir frases vacías y prioriza información útil.\n'
                 : '';
