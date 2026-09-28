@@ -1,4 +1,149 @@
-const DEFAULT_CHATBOT_ORIGIN = 'https://beto-ia-3.onrender.com';
+const DEFAULT_CHATBOT_ORIGIN = 'https://beto-ia-4.onrender.com';
+const REMINDERS_ENABLED_KEY = 'beto_deadline_reminders_enabled';
+const REMINDERS_KEY = 'beto_deadline_reminders';
+const SENT_REMINDERS_KEY = 'beto_deadline_reminders_sent';
+const REMINDER_ALARM_PREFIX = 'beto-deadline-';
+const REMINDER_LEAD_TIME = 3 * 24 * 60 * 60 * 1000;
+const MIN_ALARM_DELAY = 30 * 1000;
+
+function reminderId(url) {
+    let hash = 2166136261;
+    for (const character of url) hash = Math.imul(hash ^ character.charCodeAt(0), 16777619);
+    return (hash >>> 0).toString(36);
+}
+
+function isAllowedUnemiUrl(value) {
+    try {
+        const url = value instanceof URL ? value : new URL(value);
+        return /^https?:$/.test(url.protocol)
+            && (url.hostname === 'unemi.edu.ec' || url.hostname.endsWith('.unemi.edu.ec'));
+    } catch (_) {
+        return false;
+    }
+}
+
+function isReminderSenderAllowed(sender) {
+    return isAllowedUnemiUrl(sender.url || sender.tab?.url);
+}
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message?.type === 'beto:get-deadline-reminders-state') {
+        chrome.storage.local.get([REMINDERS_ENABLED_KEY], values => {
+            sendResponse({ enabled: !!values[REMINDERS_ENABLED_KEY] });
+        });
+        return true;
+    }
+
+    if (message?.type === 'beto:set-deadline-reminders') {
+        const enabled = Boolean(message.enabled);
+        chrome.storage.local.set({ [REMINDERS_ENABLED_KEY]: enabled }, () => {
+            if (enabled) {
+                sendResponse({ success: true, enabled });
+                return;
+            }
+
+            chrome.alarms.getAll(alarms => {
+                alarms.filter(alarm => alarm.name.startsWith(REMINDER_ALARM_PREFIX))
+                    .forEach(alarm => chrome.alarms.clear(alarm.name));
+                chrome.storage.local.set({ [REMINDERS_KEY]: {} }, () => sendResponse({ success: true, enabled }));
+            });
+        });
+        return true;
+    }
+
+    if (message?.type === 'beto:update-deadline-reminders') {
+        if (!isReminderSenderAllowed(sender)) {
+            sendResponse({ success: false });
+            return;
+        }
+
+        chrome.storage.local.get([REMINDERS_ENABLED_KEY, REMINDERS_KEY, SENT_REMINDERS_KEY], values => {
+            if (!values[REMINDERS_ENABLED_KEY]) {
+                sendResponse({ success: true, enabled: false });
+                return;
+            }
+
+            const reminders = values[REMINDERS_KEY] || {};
+            const sentReminders = new Set(values[SENT_REMINDERS_KEY] || []);
+            (Array.isArray(message.tasks) ? message.tasks : []).slice(0, 100).forEach(task => {
+                let taskUrl;
+                try {
+                    taskUrl = new URL(task.url);
+                    if (!isAllowedUnemiUrl(taskUrl)) return;
+                } catch (_) {
+                    return;
+                }
+
+                const id = reminderId(taskUrl.href);
+                const alarmName = `${REMINDER_ALARM_PREFIX}${id}`;
+                if (task.status === 'completed') {
+                    delete reminders[id];
+                    chrome.alarms.clear(alarmName);
+                    return;
+                }
+                if (task.status !== 'pending') return;
+
+                const dueAt = Number(task.dueAt);
+                if (!Number.isFinite(dueAt) || dueAt <= Date.now()) return;
+                const sentKey = `${id}:${dueAt}`;
+                reminders[id] = {
+                    title: String(task.titulo || 'Actividad Moodle').slice(0, 160),
+                    url: taskUrl.href,
+                    dueAt,
+                    sentKey
+                };
+                if (sentReminders.has(sentKey)) return;
+
+                const alarmTime = Math.max(Date.now() + MIN_ALARM_DELAY, dueAt - REMINDER_LEAD_TIME);
+                chrome.alarms.create(alarmName, { when: alarmTime });
+            });
+
+            chrome.storage.local.set({ [REMINDERS_KEY]: reminders }, () => sendResponse({ success: true, enabled: true }));
+        });
+        return true;
+    }
+});
+
+chrome.alarms.onAlarm.addListener(alarm => {
+    if (!alarm.name.startsWith(REMINDER_ALARM_PREFIX)) return;
+    const id = alarm.name.slice(REMINDER_ALARM_PREFIX.length);
+    chrome.storage.local.get([REMINDERS_ENABLED_KEY, REMINDERS_KEY, SENT_REMINDERS_KEY], values => {
+        const reminders = values[REMINDERS_KEY] || {};
+        const reminder = reminders[id];
+        if (!values[REMINDERS_ENABLED_KEY] || !reminder || reminder.dueAt <= Date.now()) return;
+
+        const sentReminders = new Set(values[SENT_REMINDERS_KEY] || []);
+        if (sentReminders.has(reminder.sentKey)) return;
+        const remainingDays = Math.ceil((reminder.dueAt - Date.now()) / (24 * 60 * 60 * 1000));
+        const timeLeft = remainingDays < 1 ? 'menos de un día' : `${remainingDays} ${remainingDays === 1 ? 'día' : 'días'}`;
+        chrome.notifications.create(alarm.name, {
+            type: 'basic',
+            iconUrl: chrome.runtime.getURL('beto.png'),
+            title: 'Entrega próxima',
+            message: `Te quedan ${timeLeft} para entregar: ${reminder.title}`,
+            contextMessage: 'Beto · recordatorio de Moodle',
+            priority: 2
+        }, () => {
+            if (chrome.runtime.lastError) return;
+            sentReminders.add(reminder.sentKey);
+            reminders[id].notified = true;
+            chrome.storage.local.set({
+                [REMINDERS_KEY]: reminders,
+                [SENT_REMINDERS_KEY]: [...sentReminders].slice(-300)
+            });
+        });
+    });
+});
+
+chrome.notifications.onClicked.addListener(notificationId => {
+    if (!notificationId.startsWith(REMINDER_ALARM_PREFIX)) return;
+    const id = notificationId.slice(REMINDER_ALARM_PREFIX.length);
+    chrome.storage.local.get([REMINDERS_KEY], values => {
+        const reminder = values[REMINDERS_KEY]?.[id];
+        if (reminder?.url) chrome.tabs.create({ url: reminder.url });
+        chrome.notifications.clear(notificationId);
+    });
+});
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message?.type === 'beto:fetch-moodle-resource') {
@@ -6,7 +151,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             try {
                 const targetUrl = message.url;
                 if (!targetUrl) throw new Error('No se especificó la URL del recurso.');
-                const response = await fetch(targetUrl, { credentials: 'include' });
+                if (!isAllowedUnemiUrl(targetUrl)) throw new Error('El recurso debe pertenecer a un sitio de UNEMI.');
+                const response = await fetch(new URL(targetUrl).href, { credentials: 'include' });
                 if (!response.ok) {
                     throw new Error(`El recurso respondió con estado ${response.status}. Verifica que la sesión de UNEMI esté activa.`);
                 }
@@ -30,7 +176,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                     // Buscar enlaces incrustados de YouTube, Google Drive, OneDrive, etc.
                     const externalLinks = [...html.matchAll(/href=["'](https?:\/\/[^"']+)["']/gi)]
                         .map(m => m[1])
-                        .filter(u => !u.includes('capacitaciondocente.unemi.edu.ec/theme') && !u.includes('/pix/'))
+                        .filter(u => !u.includes('.unemi.edu.ec/theme') && !u.includes('/pix/'))
                         .slice(0, 20);
 
                     const iframeSrcs = [...html.matchAll(/src=["'](https?:\/\/[^"']+)["']/gi)]
@@ -67,6 +213,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         try {
             const chatbotOrigin = message.chatbotOrigin || DEFAULT_CHATBOT_ORIGIN;
             const targetUrl = new URL(message.video.url);
+            if (!isAllowedUnemiUrl(targetUrl)) throw new Error('El video debe pertenecer a un sitio de UNEMI.');
 
             // 1. Intentar descargar el recurso usando la sesión del navegador del estudiante
             let mediaUrl = targetUrl.href;

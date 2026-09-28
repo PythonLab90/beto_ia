@@ -1,0 +1,15 @@
+{
+  "name": "beto-unemi",
+  "version": "1.0.0",
+  "private": true,
+  "main": "servidor.js",
+  "scripts": {
+    "start": "node servidor.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "nodemailer": "^6.10.1"
+  }
+}

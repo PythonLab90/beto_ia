@@ -615,19 +615,26 @@
         }
 
         .presentacion-toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 5;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-wrap: wrap;
             gap: 14px;
             width: min(1180px, 100%);
             margin: 0 auto 20px;
+            padding: 12px 0;
             color: #0a2345;
+            background: rgba(235, 243, 255, 0.96);
+            backdrop-filter: blur(12px);
             font-family: "Poppins", "DM Sans", sans-serif;
         }
 
         .presentacion-toolbar strong { font-size: 20px; }
         .presentacion-toolbar span { color: #5d728d; font-size: 12px; }
-        .presentacion-toolbar-actions { display: flex; gap: 8px; }
+        .presentacion-toolbar-actions { display: flex; flex-wrap: wrap; gap: 8px; }
         .presentacion-toolbar button {
             padding: 10px 14px;
             border: 1px solid rgba(10,92,179,.14);
@@ -636,6 +643,11 @@
             background: #ffffff;
             font: 700 12px "Poppins", sans-serif;
             cursor: pointer;
+        }
+        .presentacion-toolbar .presentacion-back-button {
+            color: #ffffff;
+            background: #0a2345;
+            border-color: #0a2345;
         }
         .presentacion-toolbar button:last-child { color: #ffffff; background: linear-gradient(135deg, #0a2345, #3c8dff, #7b61ff); border-color: transparent; }
         .presentacion-slides {
@@ -869,6 +881,41 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
         }
+
+        .btn-registro-correo {
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            border-radius: 7px;
+            padding: 7px 10px;
+            background: rgba(255, 255, 255, 0.16);
+            color: #ffffff;
+            font: 600 12px Arial, sans-serif;
+            cursor: pointer;
+        }
+        .btn-registro-correo:hover { background: rgba(255, 255, 255, 0.28); }
+        #dialogoRegistroCorreo {
+            width: min(440px, calc(100vw - 32px));
+            max-height: min(90vh, 620px);
+            padding: 0;
+            border: 1px solid #dbe3ec;
+            border-radius: 12px;
+            color: #172033;
+            box-shadow: 0 24px 70px rgba(15, 23, 42, 0.28);
+        }
+        #dialogoRegistroCorreo::backdrop { background: rgba(15, 23, 42, 0.56); }
+        .registro-correo-contenido { padding: 24px; }
+        .registro-correo-contenido h2 { margin: 0 0 8px; font-size: 20px; }
+        .registro-correo-contenido p { margin: 0 0 16px; color: #526174; font-size: 14px; line-height: 1.5; }
+        .registro-correo-contenido label[for="correoAvisos"] { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 700; }
+        #correoAvisos { width: 100%; min-height: 42px; padding: 9px 11px; border: 1px solid #aab7c7; border-radius: 6px; color: #172033; font: 15px Arial, sans-serif; }
+        .registro-correo-consentimiento { display: flex; gap: 9px; align-items: flex-start; margin: 14px 0; color: #334155; font-size: 13px; line-height: 1.4; }
+        .registro-correo-consentimiento input { margin-top: 2px; }
+        .registro-correo-trampa { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+        #estadoRegistroCorreo { min-height: 20px; margin: 10px 0 0; font-size: 13px; }
+        #estadoRegistroCorreo[data-error="true"] { color: #b42318; }
+        .registro-correo-acciones { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+        .registro-correo-acciones button { min-height: 38px; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; background: #ffffff; color: #334155; font: 600 13px Arial, sans-serif; cursor: pointer; }
+        .registro-correo-acciones button[type="submit"] { border-color: #1d4ed8; background: #1d4ed8; color: #ffffff; }
+        .registro-correo-acciones button:disabled { opacity: 0.65; cursor: wait; }
 
         /* Typing Dots Animation */
         .typing-indicator {
@@ -1212,6 +1259,7 @@
                         </div>
                     </div>
                 </div>
+                <button class="btn-registro-correo" id="abrirRegistroCorreo" type="button" title="Registrar correo para avisos de tareas">Correo</button>
                 <button class="cerrar" id="cerrarChat" type="button" aria-label="Cerrar chat">&times;</button>
             </header>
 
@@ -1306,6 +1354,27 @@
         <button class="boton-asistente" id="abrirChat" type="button" aria-label="Abrir chat con Beto" aria-expanded="false">
             <img src="img/beto.png" alt="Abrir asistente Beto" class="beto">
         </button>
+
+        <dialog id="dialogoRegistroCorreo" aria-labelledby="tituloRegistroCorreo">
+            <div class="registro-correo-contenido">
+                <h2 id="tituloRegistroCorreo">Avisos de tareas por correo</h2>
+                <p>Beto no puede ver tu correo. Escríbelo aquí; enviaremos un enlace para confirmar que te pertenece. Solo después de confirmarlo quedará registrado.</p>
+                <form id="formularioRegistroCorreo">
+                    <label for="correoAvisos">Tu correo electrónico</label>
+                    <input id="correoAvisos" name="email" type="email" autocomplete="email" maxlength="254" required>
+                    <label class="registro-correo-consentimiento">
+                        <input name="consent" type="checkbox" required>
+                        <span>Acepto guardar este correo y recibir recordatorios académicos de Beto.</span>
+                    </label>
+                    <label class="registro-correo-trampa" aria-hidden="true">Deja este campo vacío<input name="website" type="text" tabindex="-1" autocomplete="off"></label>
+                    <p id="estadoRegistroCorreo" role="status" aria-live="polite"></p>
+                    <div class="registro-correo-acciones">
+                        <button id="cancelarRegistroCorreo" type="button">Cancelar</button>
+                        <button id="enviarRegistroCorreo" type="submit">Enviar confirmación</button>
+                    </div>
+                </form>
+            </div>
+        </dialog>
     </div>
 
     <script>
@@ -1314,6 +1383,11 @@
         }
         const abrirChat = document.getElementById('abrirChat');
         const cerrarChat = document.getElementById('cerrarChat');
+        const abrirRegistroCorreo = document.getElementById('abrirRegistroCorreo');
+        const dialogoRegistroCorreo = document.getElementById('dialogoRegistroCorreo');
+        const formularioRegistroCorreo = document.getElementById('formularioRegistroCorreo');
+        const estadoRegistroCorreo = document.getElementById('estadoRegistroCorreo');
+        const enviarRegistroCorreo = document.getElementById('enviarRegistroCorreo');
         const ventanaChat = document.getElementById('ventanaChat');
         const formulario = document.getElementById('formulario');
         const mensajeInput = document.getElementById('mensajeInput');
@@ -1348,6 +1422,42 @@
         const allowedParentOrigins = Array.isArray(window.BETO_ALLOWED_ORIGINS)
             ? window.BETO_ALLOWED_ORIGINS
             : [];
+
+        abrirRegistroCorreo.addEventListener('click', () => {
+            estadoRegistroCorreo.textContent = '';
+            estadoRegistroCorreo.dataset.error = 'false';
+            dialogoRegistroCorreo.showModal();
+            document.getElementById('correoAvisos').focus();
+        });
+        document.getElementById('cancelarRegistroCorreo').addEventListener('click', () => dialogoRegistroCorreo.close());
+        dialogoRegistroCorreo.addEventListener('click', event => {
+            if (event.target === dialogoRegistroCorreo) dialogoRegistroCorreo.close();
+        });
+        formularioRegistroCorreo.addEventListener('submit', async event => {
+            event.preventDefault();
+            enviarRegistroCorreo.disabled = true;
+            estadoRegistroCorreo.dataset.error = 'false';
+            estadoRegistroCorreo.textContent = 'Enviando enlace de confirmación...';
+            try {
+                const response = await fetch('/api/email-reminders/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: formularioRegistroCorreo.elements.email.value.trim(),
+                        consent: formularioRegistroCorreo.elements.consent.checked,
+                        website: formularioRegistroCorreo.elements.website.value
+                    })
+                });
+                const result = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(result.error || 'No se pudo registrar el correo.');
+                estadoRegistroCorreo.textContent = result.message || 'Revisa tu correo para confirmar el registro.';
+            } catch (error) {
+                estadoRegistroCorreo.dataset.error = 'true';
+                estadoRegistroCorreo.textContent = error.message || 'No se pudo conectar con el servidor.';
+            } finally {
+                enviarRegistroCorreo.disabled = false;
+            }
+        });
 
         function isAllowedParent(event) {
             return event.source === window.parent
@@ -1466,29 +1576,46 @@
                 }
             }
 
+            const tablasContexto = Array.isArray(contenido.page.tables)
+                ? contenido.page.tables.map((tabla, indice) => {
+                    const filas = (tabla.rows || []).map(fila => fila.join(' | ')).join('\n');
+                    return `Tabla ${indice + 1}${tabla.caption ? `: ${tabla.caption}` : ''}\n${filas}`;
+                }).join('\n\n').slice(0, 10000)
+                : '';
+            const imagenesContexto = Array.isArray(contenido.page.images)
+                ? contenido.page.images.map(imagen => imagen.descripcion || imagen.url).filter(Boolean).join('\n').slice(0, 3000)
+                : '';
+            const actividadesContexto = Array.isArray(contenido.course?.tasks)
+                ? contenido.course.tasks.map(item => {
+                    const estado = item.status === 'pending' ? 'Pendiente' : item.status === 'completed' ? 'Completada' : 'Estado no visible';
+                    return `${item.titulo} [${estado}${item.statusText ? `: ${item.statusText}` : ''}]: ${item.url}`;
+                }).join('\n').slice(0, 5000)
+                : '';
+
             contextoPagina = [
                 contenido.course?.title ? `Curso actual: ${contenido.course.title}` : '',
                 contenido.course?.section ? `Sección/Tema: ${contenido.course.section}` : '',
                 contenido.course?.activity ? `Actividad actual: ${contenido.course.activity}` : '',
                 `Sitio: ${contenido.site.title || ''}`,
+                contenido.site.description ? `Descripción del sitio: ${contenido.site.description}` : '',
                 `URL: ${contenido.site.url || ''}`,
-                contenido.page.text || '',
                 Array.isArray(contenido.page.headings) && contenido.page.headings.length
-                    ? `Encabezados de la clase:\n${contenido.page.headings.map(item => `${'#'.repeat(item.nivel)} ${item.texto}`).join('\n')}`
+                    ? `Encabezados de la página:\n${contenido.page.headings.map(item => `${'#'.repeat(item.nivel)} ${item.texto}`).join('\n').slice(0, 5000)}`
                     : '',
+                tablasContexto ? `Tablas de la página:\n${tablasContexto}` : '',
+                imagenesContexto ? `Imágenes y descripciones:\n${imagenesContexto}` : '',
                 Array.isArray(contenido.page.links) && contenido.page.links.length
-                    ? `Enlaces y recursos:\n${contenido.page.links.map(item => `${item.texto}: ${item.url}`).join('\n')}`
+                    ? `Enlaces y recursos:\n${contenido.page.links.map(item => `${item.texto}: ${item.url}`).join('\n').slice(0, 8000)}`
                     : '',
+                contenido.page.text ? `Texto visible de la página:\n${contenido.page.text.slice(0, 26000)}` : '',
                 Array.isArray(contenido.page.videos) && contenido.page.videos.length
-                    ? `Videos de la clase:\n${contenido.page.videos.map(item => `${item.titulo || 'Video'}: ${item.url}`).join('\n')}`
+                    ? `Videos de la página:\n${contenido.page.videos.map(item => `${item.titulo || 'Video'}: ${item.url}`).join('\n').slice(0, 4000)}`
                     : '',
-                Array.isArray(contenido.course?.tasks) && contenido.course.tasks.length
-                    ? `Actividades y tareas:\n${contenido.course.tasks.map(item => `${item.titulo}: ${item.url}`).join('\n')}`
-                    : '',
+                actividadesContexto ? `Actividades y tareas:\n${actividadesContexto}` : '',
                 Array.isArray(contenido.course?.dates) && contenido.course.dates.length
                     ? `Fechas límite detectadas: ${contenido.course.dates.join(', ')}`
                     : ''
-            ].filter(Boolean).join('\n\n').slice(0, 14000);
+            ].filter(Boolean).join('\n\n');
 
             event.source.postMessage({ type: 'beto:context-received', version: 1 }, event.origin);
         });
@@ -2349,7 +2476,8 @@
             overlay.innerHTML = `<div class="presentacion-toolbar">
                 <div><strong>${escaparHtml(tituloPresentacion.replace(/_/g, ' '))}</strong><br><span>${diapositivas.length} diapositivas listas para revisar</span></div>
                 <div class="presentacion-toolbar-actions">
-                    <button type="button" onclick="cerrarVistaPresentacion()">Cerrar</button>
+                    <button type="button" class="presentacion-back-button" onclick="cerrarVistaPresentacion()">← Volver al chat</button>
+                    <button type="button" onclick="window.location.assign('/')">Inicio de Beto</button>
                     <button type="button" onclick="descargarPresentacionPDF()">Descargar PDF visual</button>
                     <button type="button" onclick="descargarPresentacion()">Descargar PowerPoint</button>
                 </div>
@@ -2729,9 +2857,12 @@
                 contextoAdicional = `\n\nContenido extraído automáticamente del recurso de Moodle "${recursoExtra.title || 'Recurso'}":\n${recursoExtra.text}`;
             }
 
+            const limiteContexto = 50000;
             const limiteCaracteres = 14000;
-            const contextoParaEnviar = (contextoPagina + contextoAdicional)
-                ? `\n\nContexto de la página del curso:\n${contextoPagina}${contextoAdicional}`
+            const contextoCompleto = contextoPagina + contextoAdicional;
+            const contextoRecortado = contextoCompleto.length > limiteContexto;
+            const contextoParaEnviar = contextoCompleto
+                ? `\n\nContexto de la página:\n${contextoCompleto.slice(0, limiteContexto)}${contextoRecortado ? '\n[Contexto parcial: se omitió contenido por el límite de tamaño.]' : ''}`
                 : '';
             const limitePorDocumento = Math.floor(13000 / (contenidosArchivos.length || 1));
             const documentos = contenidosArchivos.map((contenido, indice) =>
@@ -2784,7 +2915,12 @@
                 if (!respuesta.ok) {
                     agregarMensajeBeto(datos.error || 'No se pudo conectar con el servidor.', true);
                 } else {
-                    agregarMensajeBeto(datos.reply || 'No recibí una respuesta.');
+                    const respuestaBeto = typeof datos.reply === 'string' ? datos.reply.trim() : '';
+                    if (respuestaBeto) {
+                        agregarMensajeBeto(respuestaBeto);
+                    } else {
+                        agregarMensajeBeto('El servidor respondió sin texto. Inténtalo de nuevo en unos segundos.', true);
+                    }
                 }
             } catch (error) {
                 removerCargando();

@@ -1,14 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Beto para Moodle UNEMI",
-  "version": "1.7.0",
-  "description": "Asistente Beto para Moodle UNEMI: chat académico, documentos, videos y presentaciones.",
+  "name": "Beto IA para todos los sitios",
+  "version": "1.7.4",
+  "description": "Asistente Beto IA para chat, documentos, videos y presentaciones en cualquier sitio web.",
   "content_scripts": [
     {
-      "matches": [
-        "https://capacitaciondocente.unemi.edu.ec/*",
-        "http://capacitaciondocente.unemi.edu.ec/*"
-      ],
+      "matches": ["<all_urls>"],
       "js": ["content.js"],
       "run_at": "document_idle"
     }
@@ -17,14 +14,16 @@
     "service_worker": "background.js"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "alarms",
+    "notifications"
   ],
   "host_permissions": [
-    "https://capacitaciondocente.unemi.edu.ec/*",
-    "http://capacitaciondocente.unemi.edu.ec/*",
-    "https://beto-ia-3.onrender.com/*"
+    "https://*.unemi.edu.ec/*",
+    "http://*.unemi.edu.ec/*",
+    "https://beto-ia-4.onrender.com/*"
   ],
   "action": {
-    "default_title": "Beto para Moodle"
+    "default_title": "Beto IA"
   }
 }

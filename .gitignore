@@ -6,3 +6,5 @@ __pycache__/
 *.py[cod]
 node_modules/
 .vscode/
+beto_email_reminders.sqlite3*
+beto_email_reminders.json*

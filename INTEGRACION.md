@@ -88,3 +88,14 @@ GROQ_API_KEY=tu_groq_api_key_aqui
 GROQ_MODEL=openai/gpt-oss-20b
 GROQ_TRANSCRIPTION_MODEL=whisper-large-v3-turbo
 ```
+
+### Desplegar el servidor Node en Render
+
+Configura el servicio conectado al repositorio con:
+
+- **Build Command:** `npm install`
+- **Start Command:** `npm start`
+
+En **Environment**, configura las variables de `.env.example`. Para Gmail usa una contraseña de aplicación y guarda `EMAIL_HOST_PASSWORD` como secreto de Render; nunca la subas a Git. Define `PUBLIC_BASE_URL` con el dominio público del servicio, por ejemplo `https://beto-ia-4.onrender.com`.
+
+El registro de correo se guarda en el archivo indicado por `EMAIL_REMINDERS_FILE`. El sistema de archivos temporal de un servicio gratuito puede perder registros al reiniciarse; para conservarlos se necesita almacenamiento persistente o una base de datos externa. Esta versión confirma el correo de registro; el envío programado de recordatorios de tareas por email todavía requiere implementarse.
