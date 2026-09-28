@@ -29,7 +29,7 @@ Los avisos solo se programan cuando Moodle muestra una tarea pendiente y una fec
 2. Escribe tu dirección, acepta recibir recordatorios y pulsa **Enviar confirmación**.
 3. Abre el mensaje de Beto y confirma la dirección desde el enlace. El enlace vence en 24 horas.
 
-Beto no lee tu bandeja ni obtiene el correo desde Moodle. El registro queda pendiente hasta que se confirma. Para enviar el mensaje, configura las variables SMTP de `.env.example`; con Gmail usa una contraseña de aplicación, nunca la contraseña normal. En Render, configura estos valores como secretos y define `PUBLIC_BASE_URL` con el dominio público. No subas credenciales a Git.
+Beto no lee tu bandeja ni obtiene el correo desde Moodle. El registro queda pendiente hasta que se confirma. En local puede usarse SMTP. Render Free bloquea los puertos SMTP habituales; allí configura `EMAIL_PROVIDER=brevo`, una clave API de Brevo como secreto y un remitente verificado en ese servicio. No subas credenciales a Git.
 
 El servidor Node guarda los registros en `EMAIL_REMINDERS_FILE`. En producción debe apuntar a almacenamiento persistente; el disco temporal de un servicio gratuito puede perderlos al reiniciarse. Esta función registra y confirma el correo; el envío automático de recordatorios de tareas por email requiere además programar el envío de vencimientos.
 

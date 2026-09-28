@@ -91,17 +91,25 @@ function emailConfirmationPage(title, message, status = 200) {
 }
 
 async function registerEmailSubscription(request) {
+    const emailProvider = (process.env.EMAIL_PROVIDER || 'smtp').toLowerCase();
+    const useBrevo = emailProvider === 'brevo';
+    const brevoApiKey = process.env.BREVO_API_KEY;
+    const brevoSenderEmail = process.env.BREVO_SENDER_EMAIL;
+    const brevoSenderName = process.env.BREVO_SENDER_NAME || 'Beto UNEMI';
     const emailHost = process.env.EMAIL_HOST;
     const emailUser = process.env.EMAIL_HOST_USER;
     const emailPassword = process.env.EMAIL_HOST_PASSWORD;
     const fromAddress = process.env.DEFAULT_FROM_EMAIL || emailUser;
     const publicBaseUrl = process.env.PUBLIC_BASE_URL || process.env.RENDER_EXTERNAL_URL;
-    const missingSettings = [
-        ['EMAIL_HOST', emailHost],
-        ['EMAIL_HOST_USER', emailUser],
-        ['EMAIL_HOST_PASSWORD', emailPassword],
-        ['PUBLIC_BASE_URL o RENDER_EXTERNAL_URL', publicBaseUrl]
-    ].filter(([, value]) => !value).map(([name]) => name);
+    if (!['smtp', 'brevo'].includes(emailProvider)) {
+        return { status: 500, body: { error: 'EMAIL_PROVIDER debe ser smtp o brevo.' } };
+    }
+    const missingSettings = (useBrevo
+        ? [['BREVO_API_KEY', brevoApiKey], ['BREVO_SENDER_EMAIL', brevoSenderEmail]]
+        : [['EMAIL_HOST', emailHost], ['EMAIL_HOST_USER', emailUser], ['EMAIL_HOST_PASSWORD', emailPassword]])
+        .concat([['PUBLIC_BASE_URL o RENDER_EXTERNAL_URL', publicBaseUrl]])
+        .filter(([, value]) => !value)
+        .map(([name]) => name);
     if (missingSettings.length) {
         return {
             status: 503,
@@ -114,7 +122,7 @@ async function registerEmailSubscription(request) {
 
     const secure = process.env.EMAIL_USE_SSL === 'true';
     const requireTls = process.env.EMAIL_USE_TLS !== 'false';
-    if (secure && requireTls) {
+    if (!useBrevo && secure && requireTls) {
         return { status: 500, body: { error: 'La configuración SMTP no puede usar TLS y SSL a la vez.' } };
     }
 
@@ -169,26 +177,54 @@ async function registerEmailSubscription(request) {
 
     if (!registration.token) return registration;
     const confirmationUrl = `${publicBaseUrl.replace(/\/+$/, '')}/api/email-reminders/confirm?token=${encodeURIComponent(registration.token)}`;
-    const transporter = nodemailer.createTransport({
-        host: emailHost,
-        port: Number(process.env.EMAIL_PORT || 587),
-        secure,
-        requireTLS: requireTls,
-        auth: { user: emailUser, pass: emailPassword },
-        connectionTimeout: 15000,
-        greetingTimeout: 10000,
-        socketTimeout: 15000
-    });
+    const subject = 'Confirma tus avisos de tareas de Beto';
+    const text = `Solicitaste recibir recordatorios de tareas de Beto. Confirma tu correo abriendo este enlace:\n\n${confirmationUrl}\n\nEl enlace vence en 24 horas. Si no hiciste esta solicitud, ignora este mensaje.`;
+    const html = `<p>Solicitaste recibir recordatorios de tareas de Beto.</p><p><a href="${escapeHtml(confirmationUrl)}">Confirmar mi correo</a></p><p>El enlace vence en 24 horas. Si no hiciste esta solicitud, ignora este mensaje.</p>`;
     try {
-        await transporter.sendMail({
-            from: fromAddress,
-            to: email,
-            subject: 'Confirma tus avisos de tareas de Beto',
-            text: `Solicitaste recibir recordatorios de tareas de Beto. Confirma tu correo abriendo este enlace:\n\n${confirmationUrl}\n\nEl enlace vence en 24 horas. Si no hiciste esta solicitud, ignora este mensaje.`,
-            html: `<p>Solicitaste recibir recordatorios de tareas de Beto.</p><p><a href="${escapeHtml(confirmationUrl)}">Confirmar mi correo</a></p><p>El enlace vence en 24 horas. Si no hiciste esta solicitud, ignora este mensaje.</p>`
+        if (useBrevo) {
+            const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+                method: 'POST',
+                headers: {
+                    accept: 'application/json',
+                    'api-key': brevoApiKey,
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sender: { name: brevoSenderName, email: brevoSenderEmail },
+                    to: [{ email }],
+                    subject,
+                    textContent: text,
+                    htmlContent: html
+                }),
+                signal: AbortSignal.timeout(15000)
+            });
+            if (!response.ok) {
+                const result = await response.json().catch(() => ({}));
+                const error = new Error(result.message || `Brevo respondió con estado ${response.status}.`);
+                error.statusCode = response.status;
+                throw error;
+            }
+        } else {
+            const transporter = nodemailer.createTransport({
+                host: emailHost,
+                port: Number(process.env.EMAIL_PORT || 587),
+                secure,
+                requireTLS: requireTls,
+                auth: { user: emailUser, pass: emailPassword },
+                connectionTimeout: 15000,
+                greetingTimeout: 10000,
+                socketTimeout: 15000
+            });
+            await transporter.sendMail({ from: fromAddress, to: email, subject, text, html });
+        }
+    } catch (error) {
+        console.error('No se pudo enviar la confirmación por correo.', {
+            provider: emailProvider,
+            code: error.code,
+            status: error.statusCode || error.responseCode,
+            command: error.command
         });
-    } catch (_) {
-        return { status: 502, body: { error: 'No se pudo enviar el correo de confirmación. Revisa la configuración SMTP.' } };
+        return { status: 502, body: { error: 'No se pudo enviar el correo de confirmación. Revisa la clave API y el remitente verificado del proveedor.' } };
     }
 
     return { status: 200, body: { message: 'Te enviamos un enlace de confirmación. Revisa tu bandeja de entrada y spam.' } };

@@ -96,6 +96,6 @@ Configura el servicio conectado al repositorio con:
 - **Build Command:** `npm install`
 - **Start Command:** `npm start`
 
-En **Environment**, configura las variables de `.env.example`. Para Gmail usa una contraseña de aplicación y guarda `EMAIL_HOST_PASSWORD` como secreto de Render; nunca la subas a Git. Define `PUBLIC_BASE_URL` como `https://beto-ia-6.onrender.com`.
+Para pruebas locales, `EMAIL_PROVIDER=smtp` usa las variables SMTP de `.env.example`. Los servicios Free de Render bloquean las conexiones SMTP salientes por los puertos 25, 465 y 587. Para mantener Render Free, configura `EMAIL_PROVIDER=brevo`, guarda `BREVO_API_KEY` como secreto y registra/verifica el remitente indicado en `BREVO_SENDER_EMAIL` en Brevo. La aplicación envía por su API HTTPS; `RENDER_EXTERNAL_URL` proporciona automáticamente la URL pública para el enlace de confirmación. No subas claves a Git.
 
 El registro de correo se guarda en el archivo indicado por `EMAIL_REMINDERS_FILE`. El sistema de archivos temporal de un servicio gratuito puede perder registros al reiniciarse; para conservarlos se necesita almacenamiento persistente o una base de datos externa. Esta versión confirma el correo de registro; el envío programado de recordatorios de tareas por email todavía requiere implementarse.
