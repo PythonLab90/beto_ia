@@ -324,6 +324,7 @@ const server = http.createServer(async (request, response) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`Beto disponible en http://localhost:${PORT}`);
+    const publicUrl = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+    console.log(`Beto disponible en ${publicUrl}`);
 });
 
