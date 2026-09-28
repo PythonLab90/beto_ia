@@ -1,7 +1,7 @@
 (() => {
     'use strict';
 
-    const CHATBOT_ORIGIN = 'https://beto-ia-4.onrender.com';
+    const CHATBOT_ORIGIN = 'https://beto-ia-6.onrender.com';
     const ROOT_ID = 'beto-extension-root';
     let iframe;
     let lastContext = '';

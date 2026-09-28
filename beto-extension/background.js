@@ -1,4 +1,4 @@
-const DEFAULT_CHATBOT_ORIGIN = 'https://beto-ia-4.onrender.com';
+const DEFAULT_CHATBOT_ORIGIN = 'https://beto-ia-6.onrender.com';
 const REMINDERS_ENABLED_KEY = 'beto_deadline_reminders_enabled';
 const REMINDERS_KEY = 'beto_deadline_reminders';
 const SENT_REMINDERS_KEY = 'beto_deadline_reminders_sent';
