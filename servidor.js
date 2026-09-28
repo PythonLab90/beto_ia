@@ -94,10 +94,22 @@ async function registerEmailSubscription(request) {
     const emailHost = process.env.EMAIL_HOST;
     const emailUser = process.env.EMAIL_HOST_USER;
     const emailPassword = process.env.EMAIL_HOST_PASSWORD;
-    const fromAddress = process.env.DEFAULT_FROM_EMAIL;
-    const publicBaseUrl = process.env.PUBLIC_BASE_URL;
-    if (!emailHost || !emailUser || !emailPassword || !fromAddress || !publicBaseUrl) {
-        return { status: 503, body: { error: 'El servidor todavía no tiene configurado el envío de correo.' } };
+    const fromAddress = process.env.DEFAULT_FROM_EMAIL || emailUser;
+    const publicBaseUrl = process.env.PUBLIC_BASE_URL || process.env.RENDER_EXTERNAL_URL;
+    const missingSettings = [
+        ['EMAIL_HOST', emailHost],
+        ['EMAIL_HOST_USER', emailUser],
+        ['EMAIL_HOST_PASSWORD', emailPassword],
+        ['PUBLIC_BASE_URL o RENDER_EXTERNAL_URL', publicBaseUrl]
+    ].filter(([, value]) => !value).map(([name]) => name);
+    if (missingSettings.length) {
+        return {
+            status: 503,
+            body: {
+                error: `Faltan variables de correo en el servidor: ${missingSettings.join(', ')}.`,
+                missing: missingSettings
+            }
+        };
     }
 
     const secure = process.env.EMAIL_USE_SSL === 'true';
