@@ -16,7 +16,10 @@ function local_beto_before_footer() {
         return;
     }
 
-    $baseurl = trim((string)get_config('local_beto', 'baseurl'));
+    $configuredbaseurl = get_config('local_beto', 'baseurl');
+    $baseurl = $configuredbaseurl === false
+        ? 'https://beto-ia-14.onrender.com'
+        : trim((string)$configuredbaseurl);
     if ($baseurl === '') {
         return;
     }

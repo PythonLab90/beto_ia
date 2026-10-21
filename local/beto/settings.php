@@ -16,7 +16,7 @@ if ($hassiteconfig) {
         'local_beto/baseurl',
         get_string('baseurl', 'local_beto'),
         get_string('baseurl_desc', 'local_beto'),
-        '',
+        'https://beto-ia-14.onrender.com',
         PARAM_URL
     ));
 }

@@ -7,7 +7,7 @@ Este plugin agrega el asistente Beto a las páginas de Moodle de usuarios con se
 1. Copia la carpeta `beto` a `<moodle>/local/beto`.
 2. Inicia sesión como administrador y abre **Administración del sitio > Notificaciones** para completar la instalación.
 3. Abre **Administración del sitio > Plugins > Plugins locales > Beto**.
-4. Configura la URL base pública del servidor Beto, por ejemplo `https://beto.example.edu`, y guarda los cambios.
+4. La URL base `https://beto-ia-14.onrender.com` viene configurada por defecto. Si el servidor cambia, actualízala en esta página y guarda los cambios.
 5. Si Moodle usa una política CSP restrictiva, permite que su sitio cargue scripts e iframes desde el dominio de Beto.
 
 El servidor debe publicar `/beto-embed.js` y `/` en esa URL. En este repositorio ambos están disponibles con el servidor Node y Django.
