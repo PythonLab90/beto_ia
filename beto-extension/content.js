@@ -1,7 +1,8 @@
 (() => {
     'use strict';
 
-    const CHATBOT_ORIGIN = 'https://beto-ia-6.onrender.com';
+    // Detecta automáticamente si estás usando Django (8000) o Node (3000)
+const CHATBOT_ORIGIN = window.__BETO_ORIGIN__ || 'http://127.0.0.1:8000';
     const ROOT_ID = 'beto-extension-root';
     let iframe;
     let lastContext = '';

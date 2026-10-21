@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -16,7 +16,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.min.js"></script>
+    <script src="/img/fondos_presentacion/fondos.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -644,12 +644,43 @@
             font: 700 12px "Poppins", sans-serif;
             cursor: pointer;
         }
+        .presentacion-toolbar select {
+            max-width: 230px;
+            padding: 9px 12px;
+            border: 1px solid rgba(10,92,179,.2);
+            border-radius: 999px;
+            color: #0a2345;
+            background: #ffffff;
+            font: 600 12px "Poppins", sans-serif;
+        }
+        .presentacion-toolbar .pptx-images-option {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 7px;
+            color: #36506d;
+            font: 600 11px "Poppins", sans-serif;
+        }
         .presentacion-toolbar .presentacion-back-button {
             color: #ffffff;
             background: #0a2345;
             border-color: #0a2345;
         }
         .presentacion-toolbar button:last-child { color: #ffffff; background: linear-gradient(135deg, #0a2345, #3c8dff, #7b61ff); border-color: transparent; }
+        .slide-photo-credit {
+            position: absolute;
+            z-index: 2;
+            top: 67%;
+            right: 6%;
+            max-width: 29%;
+            padding: 5px 8px;
+            border-radius: 3px;
+            color: #ffffff;
+            background: rgba(10,35,69,.78);
+            font: 600 10px "Poppins", sans-serif;
+            text-decoration: none;
+        }
+        .slide-photo-credit:hover { color: #ffffff; background: #0a2345; }
         .presentacion-slides {
             display: grid;
             gap: 28px;
@@ -671,138 +702,663 @@
         .presentacion-slide-html {
             position: relative;
             min-height: min(66vw, 660px);
-            padding: clamp(30px, 5vw, 58px) clamp(30px, 7vw, 82px) 54px;
+            padding: clamp(30px, 4.5vw, 54px) clamp(30px, 6.5vw, 82px) 54px;
             overflow: hidden;
-            border-radius: 0;
-            background:
-                radial-gradient(circle at 12% 12%, rgba(87,210,255,.20), transparent 18%),
-                radial-gradient(circle at 88% 14%, rgba(255,123,191,.12), transparent 16%),
-                radial-gradient(circle at 72% 78%, rgba(123,97,255,.12), transparent 20%),
-                linear-gradient(135deg, #ffffff 0%, #f7f9fe 46%, #eef6ff 100%);
+            border-radius: 4px;
+            background-color: #f7f9fe;
+            background-image: var(--bg-contenido, url('/img/fondos_presentacion/fondo_contenido.jpg'));
+            background-position: center center;
+            background-size: cover;
+            background-repeat: no-repeat;
             box-shadow: 0 24px 60px rgba(11,57,118,.14);
             font-family: "Poppins", "DM Sans", sans-serif;
         }
-        .presentacion-slide-html.portada { color: #1d2c44; }
+        .presentacion-slide-html.cierre {
+            background-image: var(--bg-cierre, url('/img/fondos_presentacion/fondo_cierre.jpg'));
+        }
         .presentacion-slide-html::before {
+            display: none !important;
+        }
+        .presentacion-slide-html::after {
+            display: none !important;
+        }
+        .presentacion-slide-html .slide-brand {
+            display: none;
+        }
+        .presentacion-slide-html .slide-kicker {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            color: #f5822a;
+            font: 700 11.5px "Poppins", sans-serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 0 auto 6px auto;
+        }
+        .presentacion-slide-html:not(.portada) .slide-kicker {
+            text-align: left;
+            max-width: 66%;
+            margin: 0 0 6px 0;
+        }
+        .presentacion-slide-html h2 {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 84%;
+            margin: 4px auto 22px auto;
+            color: #0a2345;
+            font: 800 clamp(24px, 3.8vw, 38px)/1.15 "Montserrat", sans-serif;
+            letter-spacing: -.6px;
+        }
+        .presentacion-slide-html:not(.portada) h2 {
+            text-align: left;
+            max-width: 68%;
+            margin: 4px 0 20px 0;
+            padding-right: 15px;
+        }
+        .presentacion-slide-html h2::after {
+            content: "";
+            display: block;
+            width: 70px;
+            height: 3.5px;
+            margin: 10px auto 0 auto;
+            background: linear-gradient(90deg, #0a5cb3, #f5822a);
+            border-radius: 99px;
+        }
+        .presentacion-slide-html:not(.portada) h2::after {
+            margin: 10px 0 0 0;
+        }
+        .presentacion-slide-html.portada {
+            background-image: var(--bg-portada, url('/img/fondos_presentacion/fondo_portada.jpg'));
+            padding-top: clamp(100px, 12vw, 150px);
+            padding-bottom: 50px;
+            color: #1d2c44;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .presentacion-slide-html.portada h2 {
+            color: #0a2345;
+            font-size: clamp(30px, 4.4vw, 48px);
+            font-weight: 900;
+            line-height: 1.1;
+            max-width: 74%;
+            margin: 6px auto 18px auto;
+            text-align: center;
+        }
+        .presentacion-slide-html.portada.has-slide-image {
+            align-items: stretch;
+            padding-right: 38%;
+            padding-left: 6%;
+        }
+        .presentacion-slide-html.portada.has-slide-image .portada-ribbon,
+        .presentacion-slide-html.portada.has-slide-image .slide-kicker {
+            max-width: 100%;
+            margin-left: 0;
+            text-align: left;
+        }
+        .presentacion-slide-html.portada.has-slide-image h2 {
+            max-width: 100%;
+            margin: 10px 0 18px;
+            text-align: left;
+            font-size: clamp(28px, 3.5vw, 42px);
+        }
+        .presentacion-slide-html.portada.has-slide-image h2::after {
+            margin-left: 0;
+        }
+        .presentacion-slide-html.portada.has-slide-image .portada-hero-card {
+            width: 100%;
+            margin-left: 0;
+            padding: 20px;
+        }
+        .presentacion-slide-html.portada.has-slide-image .portada-agenda-grid {
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .presentacion-slide-html.portada.has-slide-image .portada-lead-p {
+            margin-bottom: 14px;
+            text-align: left;
+        }
+        .presentacion-slide-html.portada h2::after {
+            width: 110px;
+            height: 4px;
+            margin: 10px auto 0 auto;
+            background: linear-gradient(90deg, #0a2345, #3c8dff, #f5822a);
+        }
+        .portada-ribbon {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 18px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(10,35,69,0.08), rgba(60,141,255,0.12));
+            border: 1px solid rgba(10,92,179,0.18);
+            color: #0a5cb3;
+            font: 700 11px/1 "Poppins", sans-serif;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            margin: 0 auto 10px auto;
+        }
+        .portada-hero-card {
+            width: min(920px, 94%);
+            margin: 0 auto;
+            padding: 26px 32px;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1.5px solid rgba(60, 141, 255, 0.18);
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(10, 35, 69, 0.12), 0 4px 14px rgba(60, 141, 255, 0.08);
+            position: relative;
+            z-index: 2;
+        }
+        .portada-hero-card::before {
+            content: "";
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            width: 100%;
-            height: 8px;
-            content: "";
-            background: linear-gradient(90deg, #0a2345 0 30%, #3c8dff 30% 55%, #f5822a 55% 78%, #ff7bbf 78% 100%);
+            height: 4px;
+            border-radius: 20px 20px 0 0;
+            background: linear-gradient(90deg, #0a2345 0%, #3c8dff 40%, #f5822a 80%, #ff7bbf 100%);
         }
-        .presentacion-slide-html::after {
-            position: absolute;
-            top: 20px;
-            right: 26px;
-            width: 180px;
-            height: 180px;
-            content: "";
+        .portada-lead-p {
+            font-size: clamp(15px, 1.5vw, 17.5px);
+            line-height: 1.6;
+            color: #2c3e50;
+            text-align: center;
+            margin: 0 auto 20px auto;
+            max-width: 800px;
+            font-weight: 500;
+        }
+        .portada-agenda-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .portada-agenda-card {
+            background: linear-gradient(135deg, #ffffff, #f1f6ff);
+            border: 1px solid rgba(11, 92, 179, 0.12);
+            border-radius: 12px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(10, 35, 69, 0.04);
+            transition: transform 0.2s;
+        }
+        .portada-agenda-card:hover { transform: translateY(-2px); }
+        .portada-agenda-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #e0edff, #f0f7ff);
+            font-size: 16px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(10, 92, 179, 0.1);
+        }
+        .portada-agenda-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(245,130,42,.18), transparent 65%);
-            pointer-events: none;
+            background: linear-gradient(135deg, #0a2345, #3c8dff);
+            color: #fff;
+            font: 800 12px "Montserrat", sans-serif;
+            flex-shrink: 0;
         }
-        .presentacion-slide-html .slide-brand {
-            position: relative;
-            z-index: 1;
-            margin-top: 2px;
-            color: #0a5cb3;
-            font: 800 12px "Poppins", sans-serif;
-            letter-spacing: .7px;
-            text-transform: uppercase;
-        }
-        .presentacion-slide-html .slide-brand span { color: #f5822a; }
-        .presentacion-slide-html .slide-kicker {
-            position: relative;
-            z-index: 1;
-            color: #0a5cb3;
-            font: 700 11px "Poppins", sans-serif;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        .presentacion-slide-html.portada .slide-kicker { color: #0a5cb3; }
-        .presentacion-slide-html h2 {
-            position: relative;
-            z-index: 1;
-            max-width: 82%;
-            margin: 22px 0 25px;
+        .portada-agenda-text {
             color: #0a2345;
-            font: 800 clamp(28px, 5vw, 48px)/1.04 "Montserrat", sans-serif;
-            letter-spacing: -.8px;
+            font: 600 12.5px "Poppins", sans-serif;
+            line-height: 1.35;
         }
-        .presentacion-slide-html.portada h2 { color: #0a2345; font-size: clamp(34px, 5vw, 56px); }
-        .presentacion-slide-html.portada .slide-panel { max-width: 72%; }
-        .presentacion-slide-html.has-slide-image.portada h2,
-        .presentacion-slide-html.has-slide-image.portada .slide-panel { max-width: 54%; }
-        .presentacion-slide-html ul {
-            position: relative;
-            z-index: 1;
-            max-width: 70%;
-            margin: 0;
-            padding-left: 22px;
-            color: #1d2c44;
-            font-size: clamp(15px, 1.7vw, 20px);
-            line-height: 1.4;
+        .portada-meta-strip {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 18px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(10, 35, 69, 0.08);
+            color: #5d728d;
+            font: 600 11.5px "Poppins", sans-serif;
         }
-        .presentacion-slide-html.portada ul { color: #1d2c44; }
-        .presentacion-slide-html.portada:not(.has-slide-image) ul { max-width: 100%; }
-        .presentacion-slide-html li { margin: 0 0 14px; padding-left: 6px; }
+        .portada-meta-item { display: inline-flex; align-items: center; gap: 6px; }
         .presentacion-slide-html .slide-panel {
             position: relative;
             z-index: 1;
-            max-width: 72%;
-            padding: 20px 24px;
-            border: 1px solid rgba(11,92,179,.08);
+            width: min(1040px, 100%);
+            margin: 0 auto;
+            padding: 22px 26px;
+            border: 1px solid rgba(11,92,179,.10);
             border-radius: 18px;
-            background: linear-gradient(180deg, #fff, #f9fbff);
-            box-shadow: 0 18px 40px rgba(20,61,120,.08);
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 16px 40px rgba(10,35,69,.08);
         }
         .presentacion-slide-html .slide-panel::before {
             display: block;
             height: 4px;
-            margin: -20px -24px 16px;
+            margin: -22px -26px 18px;
             content: "";
-            background: linear-gradient(90deg, #3c8dff, #f5822a, #ff7bbf);
+            background: linear-gradient(90deg, #0a2345 0%, #3c8dff 45%, #f5822a 100%);
+        }
+
+        /* ========================================================
+           LÍNEA DE TIEMPO / PROCESO (CANVA TIMELINE)
+        ======================================================== */
+        .canva-timeline {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 30px 10px 10px;
+            width: 100%;
+        }
+        .canva-timeline-track {
+            position: absolute;
+            top: 54px;
+            left: 30px;
+            right: 30px;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #f59e0b, #8b5cf6, #10b981);
+            border-radius: 99px;
+            z-index: 1;
+        }
+        .canva-timeline-step {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .canva-timeline-badge {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 3.5px solid #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
+            margin-bottom: 16px;
+            font-size: 20px;
+        }
+        .canva-timeline-step:nth-child(2) .canva-timeline-badge { border-color: #f59e0b; }
+        .canva-timeline-step:nth-child(3) .canva-timeline-badge { border-color: #8b5cf6; }
+        .canva-timeline-step:nth-child(4) .canva-timeline-badge { border-color: #10b981; }
+        .canva-timeline-num { display: none; }
+        .canva-timeline-content {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 16px 14px;
+            box-shadow: 0 8px 22px rgba(10, 35, 69, 0.05);
+            width: 100%;
+        }
+        .canva-timeline-title {
+            font-family: "Montserrat", sans-serif;
+            font-size: 15.5px;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0 0 6px 0;
+        }
+        .canva-timeline-desc {
+            font-size: 13.5px;
+            line-height: 1.5;
+            color: #475569;
+            margin: 0;
+        }
+
+        /* ========================================================
+           FORMATO EDITORIAL NARRATIVO (SIN CAJAS, ESTILO BUSINESS)
+        ======================================================== */
+        .editorial-narrative-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            padding: 10px 4px;
+        }
+        .editorial-narrative-block {
+            position: relative;
+            padding-left: 20px;
+            border-left: 4px solid #f5822a;
+        }
+        .editorial-narrative-subtitle {
+            font-family: "Montserrat", sans-serif;
+            font-size: 21px;
+            font-weight: 800;
+            color: #0a2345;
+            margin: 0 0 10px 0;
+            line-height: 1.3;
+        }
+        .editorial-narrative-paragraph {
+            font-size: 17px;
+            line-height: 1.75;
+            color: #334155;
+            margin: 0;
+            font-weight: 400;
+        }
+
+        /* ========================================================
+           FORMATO LISTA EDITORIAL (BULLETS DESTACADOS, SIN RECUADROS PESADOS)
+        ======================================================== */
+        .editorial-list-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            padding: 6px 0;
+        }
+        .editorial-list-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.65);
+            border-bottom: 1.5px solid rgba(226, 232, 240, 0.9);
+            transition: all 0.2s ease;
+        }
+        .editorial-list-item:hover {
+            background: rgba(255, 255, 255, 0.95);
+            transform: translateX(4px);
+        }
+        .editorial-bullet-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f5822a, #ffb16f);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(245, 130, 42, 0.25);
+        }
+        .editorial-list-content {
+            flex-grow: 1;
+        }
+        .editorial-list-heading {
+            font-family: "Montserrat", sans-serif;
+            font-size: 16.5px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 4px 0;
+        }
+        .editorial-list-text {
+            font-size: 14.5px;
+            line-height: 1.55;
+            color: #475569;
+            margin: 0;
+        }
+
+        /* ========================================================
+           HERO CONCEPTUAL (CONCEPTOS CLAVE E IMPACTO)
+        ======================================================== */
+        .canva-hero-concept-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .canva-hero-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+            border: 1.5px solid #bfdbfe;
+            border-radius: 20px;
+            padding: 26px 24px;
+            box-shadow: 0 14px 34px rgba(37, 99, 235, 0.08);
+            position: relative;
+        }
+        .canva-hero-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .canva-hero-icon {
+            font-size: 28px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+        }
+        .canva-hero-title {
+            font-family: "Montserrat", sans-serif;
+            font-size: 19px;
+            font-weight: 800;
+            color: #1e3a8a;
+            margin: 0;
+        }
+        .canva-hero-body {
+            font-size: 15.5px;
+            line-height: 1.65;
+            color: #334155;
+            margin: 0;
+        }
+
+/* ========================================================
+           DISEÑO MODERNO TIPO CANVA IA: CARDS VIBRANTES Y DINÁMICAS
+        ======================================================== */
+        .canva-container {
+            display: grid;
+            gap: 18px;
+            width: 100%;
+            margin-top: 6px;
+        }
+        .canva-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .canva-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .canva-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .canva-grid-more { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+
+        .canva-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8faff 100%);
+            border-radius: 18px;
+            padding: 22px 20px;
+            box-shadow: 0 10px 30px rgba(10, 35, 69, 0.07), 0 2px 8px rgba(60, 141, 255, 0.05);
+            border: 1.5px solid rgba(226, 232, 240, 0.8);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .canva-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 36px rgba(10, 35, 69, 0.12), 0 4px 12px rgba(60, 141, 255, 0.1);
+        }
+        .canva-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4.5px;
+        }
+
+        /* Variantes de colores de Canva IA */
+        .canva-accent-blue::before { background: linear-gradient(90deg, #2563eb, #38bdf8); }
+        .canva-accent-blue .canva-card-icon { background: #eff6ff; color: #2563eb; }
+        .canva-accent-blue .canva-card-tag { background: #dbeafe; color: #1e40af; }
+
+        .canva-accent-amber::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .canva-accent-amber .canva-card-icon { background: #fffbeb; color: #d97706; }
+        .canva-accent-amber .canva-card-tag { background: #fef3c7; color: #92400e; }
+
+        .canva-accent-purple::before { background: linear-gradient(90deg, #8b5cf6, #c084fc); }
+        .canva-accent-purple .canva-card-icon { background: #f5f3ff; color: #7c3aed; }
+        .canva-accent-purple .canva-card-tag { background: #ede9fe; color: #5b21b6; }
+
+        .canva-accent-emerald::before { background: linear-gradient(90deg, #10b981, #34d399); }
+        .canva-accent-emerald .canva-card-icon { background: #ecfdf5; color: #059669; }
+        .canva-accent-emerald .canva-card-tag { background: #d1fae5; color: #065f46; }
+
+        .canva-accent-rose::before { background: linear-gradient(90deg, #f43f5e, #fb7185); }
+        .canva-accent-rose .canva-card-icon { background: #fff1f2; color: #e11d48; }
+        .canva-accent-rose .canva-card-tag { background: #ffe4e6; color: #9f1239; }
+
+        .canva-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .canva-card-icon {
+            font-size: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.04);
+        }
+        .canva-card-tag {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 999px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+        .canva-card-title {
+            font-family: "Montserrat", sans-serif;
+            font-size: 17px;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0 0 8px 0;
+            line-height: 1.3;
+        }
+        .canva-card-desc {
+            font-size: 14.5px;
+            line-height: 1.6;
+            color: #475569;
+            margin: 0;
+            font-weight: 450;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 820px) {
+            .canva-grid-2, .canva-grid-3, .canva-grid-4, .canva-grid-more {
+                grid-template-columns: 1fr;
+            }
+        }
+        .slide-academic-body {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 8px 4px;
+        }
+        .slide-academic-block {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #1e293b;
+        }
+        .slide-bullet-dot {
+            font-size: 24px;
+            line-height: 1;
+            color: #2563eb;
+            margin-top: -2px;
+            flex-shrink: 0;
+        }
+        .slide-academic-text {
+            flex: 1;
+        }
+        .slide-academic-lead {
+            color: #0f172a;
+            font-weight: 700;
+            font-family: "Montserrat", sans-serif;
+            font-size: 16.5px;
+            margin-right: 6px;
+        }
+        .slide-academic-desc {
+            color: #334155;
+            font-size: 15.5px;
+        }
+        .slide-academic-paragraph {
+            font-size: 16px;
+            line-height: 1.65;
+            color: #1e293b;
+            margin: 0;
+        }
+        .slide-intro-paragraph {
+            background: linear-gradient(135deg, #f0f6ff, #f8faff);
+            border-left: 4px solid #3c8dff;
+            border-radius: 0 12px 12px 0;
+            padding: 12px 18px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(10, 35, 69, 0.03);
+        }
+        .slide-intro-paragraph p {
+            margin: 0;
+            color: #1d2c44;
+            font-size: 14.5px;
+            line-height: 1.55;
+            font-weight: 500;
+        }
+        .intro-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: #0a5cb3;
+            color: #fff;
+            font: 800 10.5px "Poppins", sans-serif;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+            margin-top: 2px;
         }
         .presentacion-slide-html:not(.portada) .slide-panel { max-width: 100%; }
-        .presentacion-slide-html.has-slide-image:not(.portada) .slide-panel,
-        .presentacion-slide-html.has-slide-image:not(.portada) h2 { max-width: 64%; }
-        .presentacion-slide-html .slide-panel.visual-panel { padding: 20px 24px 24px; }
-        .slide-card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-        .slide-card-item {
-            min-height: 145px;
+        .presentacion-slide-html.has-slide-image:not(.portada) .slide-panel { max-width: 68%; margin-left: 0; }
+        .presentacion-slide-html .slide-panel.visual-panel { padding: 22px 26px 26px; }
+        .slide-content-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .slide-content-item {
+            display: grid;
+            grid-template-columns: 34px minmax(0, 1fr);
+            gap: 12px;
+            min-height: 112px;
             padding: 16px;
-            border: 1px solid rgba(10,92,179,.1);
+            border: 1px solid #dce8f5;
             border-radius: 12px;
-            background: linear-gradient(180deg, #ffffff, #f4f9ff);
-            box-shadow: 0 10px 22px rgba(20,61,120,.07);
+            background: #ffffff;
         }
-        .slide-card-item strong { display: block; margin-bottom: 8px; color: #0a2345; font: 800 17px "Montserrat", sans-serif; }
-        .slide-card-item span { display: block; color: #5d728d; font-size: 15px; line-height: 1.5; }
-        .slide-card-number { display: block; margin-bottom: 8px; color: #f5822a; font: 900 25px "Montserrat", sans-serif; }
-        .slide-timeline { display: grid; gap: 0; }
-        .slide-timeline-item { position: relative; display: grid; grid-template-columns: 42px 1fr; min-height: 62px; }
-        .slide-timeline-item::before { position: absolute; top: 22px; bottom: -2px; left: 13px; width: 2px; content: ""; background: #b8d7f7; }
-        .slide-timeline-item:last-child::before { display: none; }
-        .slide-timeline-dot { position: relative; z-index: 1; width: 28px; height: 28px; border: 5px solid #ffffff; border-radius: 50%; background: #3c8dff; box-shadow: 0 0 0 2px #3c8dff; }
-        .slide-timeline-item:nth-child(2n) .slide-timeline-dot { background: #f5822a; box-shadow: 0 0 0 2px #f5822a; }
-        .slide-timeline-item:nth-child(3n) .slide-timeline-dot { background: #ff7bbf; box-shadow: 0 0 0 2px #ff7bbf; }
-        .slide-timeline-item strong { display: block; margin-bottom: 3px; color: #0a2345; font: 800 17px "Montserrat", sans-serif; }
-        .slide-timeline-item span { display: block; color: #5d728d; font-size: 15px; line-height: 1.5; }
-        .slide-data-table { width: 100%; border-collapse: separate; border-spacing: 0; overflow: hidden; border: 1px solid #dce8f5; border-radius: 12px; background: #ffffff; }
-        .slide-data-table th { padding: 11px 13px; color: #ffffff; background: linear-gradient(135deg, #0a2345, #0a5cb3); font: 700 12px "Poppins", sans-serif; text-align: left; }
-        .slide-data-table td { padding: 13px 15px; border-top: 1px solid #e8eef6; color: #334e68; font-size: 15px; line-height: 1.45; vertical-align: top; }
-        .slide-data-table tr:nth-child(even) td { background: #f7faff; }
-        .slide-bars { display: grid; gap: 13px; }
-        .slide-bar-row { display: grid; grid-template-columns: minmax(120px, 1fr) 2fr; align-items: center; gap: 12px; }
-        .slide-bar-row strong { overflow: hidden; color: #0a2345; font-size: 16px; text-overflow: ellipsis; white-space: nowrap; }
-        .slide-bar-track { height: 16px; overflow: hidden; border-radius: 99px; background: #e5eef8; }
-        .slide-bar-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #3c8dff, #7b61ff, #ff7bbf); }
+        .slide-content-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            color: #ffffff;
+            background: #0a5cb3;
+            font: 700 12px "Montserrat", sans-serif;
+        }
+        .slide-content-item strong { display: block; margin: 1px 0 6px; color: #0a2345; font: 700 14px/1.3 "Montserrat", sans-serif; }
+        .slide-content-item p { margin: 0; color: #526174; font-size: 12.5px; line-height: 1.5; }
         @media (max-width: 760px) {
-            .slide-card-grid { grid-template-columns: 1fr 1fr; }
-            .slide-bar-row { grid-template-columns: 1fr; gap: 5px; }
+            .slide-content-grid { grid-template-columns: 1fr; }
         }
         .slide-ilustracion {
             position: absolute;
@@ -834,6 +1390,34 @@
             letter-spacing: .8px;
         }
         .presentacion-slide-html.portada .slide-footer { color: #7d8ca0; }
+        .slide-chart-card {
+            width: min(100%, 1040px);
+            margin: 0 auto;
+            padding: 20px 24px 14px;
+            border: 1px solid #dce8f5;
+            border-radius: 16px;
+            background: rgba(255,255,255,.97);
+            box-shadow: 0 16px 40px rgba(10,35,69,.08);
+        }
+        .slide-chart-heading {
+            margin: 0 0 8px;
+            color: #5d728d;
+            font: 700 11px "Poppins", sans-serif;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+        .slide-chart-card svg { display: block; width: 100%; height: auto; overflow: visible; }
+        .slide-chart-note {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px;
+            border: 1px solid #e7d8b5;
+            border-radius: 14px;
+            color: #594b2c;
+            background: #fffaf0;
+            font-size: 14px;
+            line-height: 1.55;
+        }
         @media (max-width: 640px) {
             .presentacion-overlay { padding: 14px; }
             .presentacion-toolbar { align-items: flex-start; flex-direction: column; }
@@ -844,7 +1428,9 @@
             .presentacion-slide-html.portada h2,
             .presentacion-slide-html.portada .slide-panel,
             .presentacion-slide-html:not(.portada) .slide-panel { max-width: 100%; }
-            .slide-card-grid { grid-template-columns: 1fr; }
+            .presentacion-slide-html.portada.has-slide-image { padding-right: 28px; padding-left: 28px; }
+            .presentacion-slide-html.portada.has-slide-image .slide-foto { margin-top: 18px; }
+            .slide-content-grid { grid-template-columns: 1fr; }
             .slide-ilustracion { right: 7%; bottom: 12%; width: 28%; opacity: .55; }
             .slide-foto { position: relative; top: auto; right: auto; width: 100%; height: 180px; margin-top: 18px; transform: none; }
         }
@@ -881,41 +1467,6 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
         }
-
-        .btn-registro-correo {
-            border: 1px solid rgba(255, 255, 255, 0.55);
-            border-radius: 7px;
-            padding: 7px 10px;
-            background: rgba(255, 255, 255, 0.16);
-            color: #ffffff;
-            font: 600 12px Arial, sans-serif;
-            cursor: pointer;
-        }
-        .btn-registro-correo:hover { background: rgba(255, 255, 255, 0.28); }
-        #dialogoRegistroCorreo {
-            width: min(440px, calc(100vw - 32px));
-            max-height: min(90vh, 620px);
-            padding: 0;
-            border: 1px solid #dbe3ec;
-            border-radius: 12px;
-            color: #172033;
-            box-shadow: 0 24px 70px rgba(15, 23, 42, 0.28);
-        }
-        #dialogoRegistroCorreo::backdrop { background: rgba(15, 23, 42, 0.56); }
-        .registro-correo-contenido { padding: 24px; }
-        .registro-correo-contenido h2 { margin: 0 0 8px; font-size: 20px; }
-        .registro-correo-contenido p { margin: 0 0 16px; color: #526174; font-size: 14px; line-height: 1.5; }
-        .registro-correo-contenido label[for="correoAvisos"] { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 700; }
-        #correoAvisos { width: 100%; min-height: 42px; padding: 9px 11px; border: 1px solid #aab7c7; border-radius: 6px; color: #172033; font: 15px Arial, sans-serif; }
-        .registro-correo-consentimiento { display: flex; gap: 9px; align-items: flex-start; margin: 14px 0; color: #334155; font-size: 13px; line-height: 1.4; }
-        .registro-correo-consentimiento input { margin-top: 2px; }
-        .registro-correo-trampa { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
-        #estadoRegistroCorreo { min-height: 20px; margin: 10px 0 0; font-size: 13px; }
-        #estadoRegistroCorreo[data-error="true"] { color: #b42318; }
-        .registro-correo-acciones { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
-        .registro-correo-acciones button { min-height: 38px; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; background: #ffffff; color: #334155; font: 600 13px Arial, sans-serif; cursor: pointer; }
-        .registro-correo-acciones button[type="submit"] { border-color: #1d4ed8; background: #1d4ed8; color: #ffffff; }
-        .registro-correo-acciones button:disabled { opacity: 0.65; cursor: wait; }
 
         /* Typing Dots Animation */
         .typing-indicator {
@@ -1259,28 +1810,43 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn-registro-correo" id="abrirRegistroCorreo" type="button" title="Registrar correo para avisos de tareas">Correo</button>
                 <button class="cerrar" id="cerrarChat" type="button" aria-label="Cerrar chat">&times;</button>
             </header>
 
-            <div id="bannerLogin" style="display:none;padding:12px 16px;background:linear-gradient(135deg, #1d4ed8, #2563eb);color:#ffffff;border-bottom:1px solid rgba(255,255,255,0.25);box-shadow:0 4px 12px rgba(29,78,216,0.25);">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                    <span style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;">
-                        🔐 <span>Asistente de Inicio de Sesión UNEMI</span>
-                    </span>
-                    <span style="font-size:10px;background:rgba(255,255,255,0.2);padding:2px 7px;border-radius:10px;font-weight:600;">login/index.php</span>
+            <div id="bannerSeguridad" style="display:none;padding:10px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font-size:12px;color:#334155;align-items:center;justify-content:space-between;">
+                <span id="bannerSeguridadTexto">🔒 Modo seguro: Inicia sesión directamente en la plataforma oficial</span>
+                <button type="button" id="btnAbrirNavegadorOficial" style="padding:4px 10px;border-radius:6px;border:1px solid #cbd5e1;background:#ffffff;font-size:11px;font-weight:600;cursor:pointer;">🌐 Abrir navegador</button>
+            </div>
+
+            <!-- Panel de Agente, Google Drive y Autorización -->
+            <div id="panelAgenteBeto" style="background:#f1f5f9;border-bottom:1px solid #cbd5e1;padding:8px 14px;font-size:12px;display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div id="estadoGoogleDrive" style="display:flex;align-items:center;gap:6px;">
+                        <span style="font-size:14px;">📁</span>
+                        <strong id="textoDriveEstado" style="color:#475569;">Google Drive: Verificando...</strong>
+                    </div>
+                    <div style="display:flex;gap:6px;">
+                        <button type="button" id="btnConectarDrive" style="padding:4px 8px;border-radius:6px;border:1px solid #3b82f6;background:#3b82f6;color:#ffffff;font-size:11px;font-weight:600;cursor:pointer;">Conectar Drive</button>
+                        <button type="button" id="btnDesconectarDrive" style="display:none;padding:4px 8px;border-radius:6px;border:1px solid #ef4444;background:#ffffff;color:#ef4444;font-size:11px;font-weight:600;cursor:pointer;">Desconectar</button>
+                    </div>
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
-                    <input id="loginUsername" type="text" placeholder="Usuario Moodle" style="padding:7px 10px;border-radius:8px;border:1px solid #93c5fd;font-size:12px;color:#0f172a;background:#ffffff;outline:none;">
-                    <input id="loginPassword" type="password" placeholder="Contraseña" style="padding:7px 10px;border-radius:8px;border:1px solid #93c5fd;font-size:12px;color:#0f172a;background:#ffffff;outline:none;">
-                </div>
-                <div style="display:flex;gap:6px;">
-                    <button type="button" id="btnLoginFillSubmit" style="flex:1;padding:8px 12px;border-radius:8px;border:0;background:linear-gradient(135deg, #f59e0b, #d97706);color:#ffffff;font-weight:700;font-size:12px;cursor:pointer;box-shadow:0 3px 8px rgba(245,158,11,0.4);transition:transform 0.2s ease;">
-                        🔑 Iniciar Sesión en 1 Clic
-                    </button>
-                    <button type="button" id="btnLoginSave" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.2);color:#ffffff;font-weight:600;font-size:11.5px;cursor:pointer;">
-                        💾 Guardar
-                    </button>
+
+                <!-- Tarea activa y solicitud de autorización -->
+                <div id="bannerTareaActiva" style="display:none;background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:8px 10px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                        <strong id="tituloTareaActiva" style="font-size:11.5px;color:#1e293b;">Tarea en progreso...</strong>
+                        <span id="badgeEstadoTarea" style="font-size:10px;padding:2px 6px;border-radius:10px;background:#e2e8f0;font-weight:700;">PENDIENTE</span>
+                    </div>
+                    <div style="background:#e2e8f0;border-radius:4px;height:5px;width:100%;overflow:hidden;margin-bottom:6px;">
+                        <div id="barraProgresoTarea" style="background:#3b82f6;height:100%;width:0%;transition:width 0.3s ease;"></div>
+                    </div>
+                    <div id="contenedorAutorizacion" style="display:none;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;padding:8px;margin-top:6px;">
+                        <p id="mensajeAutorizacion" style="font-size:11px;color:#92400e;margin-bottom:6px;font-weight:500;">Beto solicita confirmación para una acción sensible.</p>
+                        <div style="display:flex;gap:6px;">
+                            <button type="button" id="btnAutorizarAccion" style="flex:1;padding:5px 8px;background:#d97706;border:0;border-radius:5px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;">✅ Autorizar</button>
+                            <button type="button" id="btnRechazarAccion" style="flex:1;padding:5px 8px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:5px;color:#374151;font-size:11px;font-weight:600;cursor:pointer;">❌ Cancelar</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1299,9 +1865,8 @@
                     <div class="mensaje-beto-container">
                         <img src="img/beto.png" alt="" class="avatar-mini">
                         <div class="mensaje-beto">
-                            ¡Hola! 👋 Soy **Beto**, tu asistente universitario en Moodle.
-                            
-                            Puedo ayudarte a estudiar, analizar la clase y **crear documentos de Word (.docx), PDF (.pdf) y Excel (.xlsx)**. ¿Qué te gustaría hacer?
+                            ¡Hola! 👋 Soy <strong>Beto</strong>, tu asistente académico universitario de la UNEMI.<br><br>
+                            Puedo ayudarte a preparar <strong>presentaciones académicas estructuradas</strong>, analizar tus clases, resolver dudas y exportar reportes a PowerPoint (.pptx), Word (.docx), PDF (.pdf) y Excel (.xlsx). ¿Qué tema deseas trabajar hoy?
                         </div>
                     </div>
                 </div>
@@ -1355,26 +1920,6 @@
             <img src="img/beto.png" alt="Abrir asistente Beto" class="beto">
         </button>
 
-        <dialog id="dialogoRegistroCorreo" aria-labelledby="tituloRegistroCorreo">
-            <div class="registro-correo-contenido">
-                <h2 id="tituloRegistroCorreo">Avisos de tareas por correo</h2>
-                <p>Beto no puede ver tu correo. Escríbelo aquí; enviaremos un enlace para confirmar que te pertenece. Solo después de confirmarlo quedará registrado.</p>
-                <form id="formularioRegistroCorreo">
-                    <label for="correoAvisos">Tu correo electrónico</label>
-                    <input id="correoAvisos" name="email" type="email" autocomplete="email" maxlength="254" required>
-                    <label class="registro-correo-consentimiento">
-                        <input name="consent" type="checkbox" required>
-                        <span>Acepto guardar este correo y recibir recordatorios académicos de Beto.</span>
-                    </label>
-                    <label class="registro-correo-trampa" aria-hidden="true">Deja este campo vacío<input name="website" type="text" tabindex="-1" autocomplete="off"></label>
-                    <p id="estadoRegistroCorreo" role="status" aria-live="polite"></p>
-                    <div class="registro-correo-acciones">
-                        <button id="cancelarRegistroCorreo" type="button">Cancelar</button>
-                        <button id="enviarRegistroCorreo" type="submit">Enviar confirmación</button>
-                    </div>
-                </form>
-            </div>
-        </dialog>
     </div>
 
     <script>
@@ -1383,11 +1928,6 @@
         }
         const abrirChat = document.getElementById('abrirChat');
         const cerrarChat = document.getElementById('cerrarChat');
-        const abrirRegistroCorreo = document.getElementById('abrirRegistroCorreo');
-        const dialogoRegistroCorreo = document.getElementById('dialogoRegistroCorreo');
-        const formularioRegistroCorreo = document.getElementById('formularioRegistroCorreo');
-        const estadoRegistroCorreo = document.getElementById('estadoRegistroCorreo');
-        const enviarRegistroCorreo = document.getElementById('enviarRegistroCorreo');
         const ventanaChat = document.getElementById('ventanaChat');
         const formulario = document.getElementById('formulario');
         const mensajeInput = document.getElementById('mensajeInput');
@@ -1422,42 +1962,6 @@
         const allowedParentOrigins = Array.isArray(window.BETO_ALLOWED_ORIGINS)
             ? window.BETO_ALLOWED_ORIGINS
             : [];
-
-        abrirRegistroCorreo.addEventListener('click', () => {
-            estadoRegistroCorreo.textContent = '';
-            estadoRegistroCorreo.dataset.error = 'false';
-            dialogoRegistroCorreo.showModal();
-            document.getElementById('correoAvisos').focus();
-        });
-        document.getElementById('cancelarRegistroCorreo').addEventListener('click', () => dialogoRegistroCorreo.close());
-        dialogoRegistroCorreo.addEventListener('click', event => {
-            if (event.target === dialogoRegistroCorreo) dialogoRegistroCorreo.close();
-        });
-        formularioRegistroCorreo.addEventListener('submit', async event => {
-            event.preventDefault();
-            enviarRegistroCorreo.disabled = true;
-            estadoRegistroCorreo.dataset.error = 'false';
-            estadoRegistroCorreo.textContent = 'Enviando enlace de confirmación...';
-            try {
-                const response = await fetch('/api/email-reminders/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        email: formularioRegistroCorreo.elements.email.value.trim(),
-                        consent: formularioRegistroCorreo.elements.consent.checked,
-                        website: formularioRegistroCorreo.elements.website.value
-                    })
-                });
-                const result = await response.json().catch(() => ({}));
-                if (!response.ok) throw new Error(result.error || 'No se pudo registrar el correo.');
-                estadoRegistroCorreo.textContent = result.message || 'Revisa tu correo para confirmar el registro.';
-            } catch (error) {
-                estadoRegistroCorreo.dataset.error = 'true';
-                estadoRegistroCorreo.textContent = error.message || 'No se pudo conectar con el servidor.';
-            } finally {
-                enviarRegistroCorreo.disabled = false;
-            }
-        });
 
         function isAllowedParent(event) {
             return event.source === window.parent
@@ -1551,28 +2055,13 @@
                 bannerCurso.style.display = 'flex';
             }
 
-            // Mostrar u ocultar banner de login
-            const bannerLogin = document.getElementById('bannerLogin');
-            const loginUsername = document.getElementById('loginUsername');
-            const loginPassword = document.getElementById('loginPassword');
-            const btnLoginFillSubmit = document.getElementById('btnLoginFillSubmit');
-            const btnLoginSave = document.getElementById('btnLoginSave');
-
-            if (loginUsername && loginPassword) {
-                try {
-                    const u = localStorage.getItem('beto_user');
-                    const p = localStorage.getItem('beto_pass');
-                    if (u && !loginUsername.value) loginUsername.value = u;
-                    if (p && !loginPassword.value) loginPassword.value = p;
-                } catch (_) {}
-            }
-
-            if (bannerLogin) {
-                if (contenido.site?.isLoginPage || (contenido.site?.url && contenido.site.url.includes('/login/'))) {
-                    bannerLogin.style.display = 'block';
-                    if (bannerCurso) bannerCurso.style.display = 'none';
+            // Notificación de seguridad para páginas con login oficial
+            const bannerSeguridad = document.getElementById('bannerSeguridad');
+            if (bannerSeguridad) {
+                if (contenido.site?.isLoginPage || (contenido.site?.url && (contenido.site.url.includes('/login/') || contenido.site.url.includes('auth')))) {
+                    bannerSeguridad.style.display = 'flex';
                 } else {
-                    bannerLogin.style.display = 'none';
+                    bannerSeguridad.style.display = 'none';
                 }
             }
 
@@ -1620,43 +2109,79 @@
             event.source.postMessage({ type: 'beto:context-received', version: 1 }, event.origin);
         });
 
-        // Eventos para botones de Inicio de Sesión
-        document.addEventListener('click', event => {
-            if (event.target?.id === 'btnLoginFillSubmit' || event.target?.closest('#btnLoginFillSubmit')) {
-                const u = document.getElementById('loginUsername')?.value.trim();
-                const p = document.getElementById('loginPassword')?.value.trim();
-                if (!u || !p) return alert('Por favor ingresa usuario y contraseña.');
-                try {
-                    localStorage.setItem('beto_user', u);
-                    localStorage.setItem('beto_pass', p);
-                } catch (_) {}
-                if (window.parent !== window) {
-                    window.parent.postMessage({
-                        type: 'beto:fill-credentials',
-                        username: u,
-                        password: p,
-                        submit: true,
-                        save: true
-                    }, '*');
+        // Gestión segura de Google Drive, Tareas y Navegador Asistido
+        let tareaActivaId = null;
+
+        async function actualizarEstadoDrive() {
+            const textoDrive = document.getElementById('textoDriveEstado');
+            const btnConectar = document.getElementById('btnConectarDrive');
+            const btnDesconectar = document.getElementById('btnDesconectarDrive');
+            if (!textoDrive) return;
+
+            try {
+                const res = await fetch('/api/auth/google/status');
+                const data = await res.json();
+                if (data.connected) {
+                    const userEmail = data.profile?.email || 'Cuenta autorizada';
+                    textoDrive.innerHTML = `<span style="color:#16a34a;">🟢 Drive conectado (${userEmail})</span>`;
+                    if (btnConectar) btnConectar.style.display = 'none';
+                    if (btnDesconectar) btnDesconectar.style.display = 'inline-block';
+                } else if (data.configured) {
+                    textoDrive.innerHTML = '<span style="color:#f59e0b;">⚪ Drive desconectado</span>';
+                    if (btnConectar) btnConectar.style.display = 'inline-block';
+                    if (btnDesconectar) btnDesconectar.style.display = 'none';
+                } else {
+                    textoDrive.innerHTML = '<span style="color:#64748b;">⚙️ Drive requiere credenciales en .env</span>';
+                    if (btnConectar) btnConectar.style.display = 'none';
+                    if (btnDesconectar) btnDesconectar.style.display = 'none';
                 }
-            } else if (event.target?.id === 'btnLoginSave' || event.target?.closest('#btnLoginSave')) {
-                const u = document.getElementById('loginUsername')?.value.trim();
-                const p = document.getElementById('loginPassword')?.value.trim();
-                if (!u || !p) return alert('Por favor ingresa usuario y contraseña.');
-                try {
-                    localStorage.setItem('beto_user', u);
-                    localStorage.setItem('beto_pass', p);
-                } catch (_) {}
-                if (window.parent !== window) {
-                    window.parent.postMessage({
-                        type: 'beto:fill-credentials',
-                        username: u,
-                        password: p,
-                        submit: false,
-                        save: true
-                    }, '*');
+            } catch (_) {
+                textoDrive.textContent = 'Drive: No disponible';
+            }
+        }
+
+        actualizarEstadoDrive();
+
+        window.addEventListener('message', event => {
+            if (event.data?.type === 'BETO_GOOGLE_AUTH_SUCCESS' || event.data?.betoGoogleAuth === 'ok') {
+                actualizarEstadoDrive();
+            }
+        });
+
+        document.addEventListener('click', async event => {
+            if (event.target?.id === 'btnConectarDrive') {
+                window.open('/api/auth/google/login', 'BetoGoogleAuth', 'width=550,height=650');
+            } else if (event.target?.id === 'btnDesconectarDrive') {
+                if (confirm('¿Deseas desconectar Google Drive y revocar los permisos locales?')) {
+                    await fetch('/api/auth/google/disconnect', { method: 'POST' });
+                    actualizarEstadoDrive();
                 }
-                alert('Credenciales guardadas con éxito para autocompletado.');
+            } else if (event.target?.id === 'btnAbrirNavegadorOficial') {
+                const url = window.webContext?.site?.url || 'https://sga.unemi.edu.ec';
+                fetch('/api/navegador/abrir', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url, headless: false })
+                }).catch(() => {});
+            } else if (event.target?.id === 'btnAutorizarAccion') {
+                if (tareaActivaId) {
+                    await fetch(`/api/tareas/${tareaActivaId}/autorizar`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ autorizada: true })
+                    });
+                    document.getElementById('contenedorAutorizacion').style.display = 'none';
+                }
+            } else if (event.target?.id === 'btnRechazarAccion') {
+                if (tareaActivaId) {
+                    await fetch(`/api/tareas/${tareaActivaId}/autorizar`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ autorizada: false })
+                    });
+                    document.getElementById('contenedorAutorizacion').style.display = 'none';
+                    document.getElementById('bannerTareaActiva').style.display = 'none';
+                }
             }
         });
 
@@ -2279,39 +2804,47 @@
             let tituloPresentacion = '';
             const guardar = () => {
                 if (!actual) return;
-                actual.puntos = actual.puntos.filter(Boolean).slice(0, 5);
+                actual.puntos = actual.puntos.filter(Boolean).slice(0, 7);
                 if (actual.titulo || actual.puntos.length) diapositivas.push(actual);
+            };
+
+            const limpiarTextoMarkdown = (str) => {
+                return String(str || '')
+                    .replace(/\*\*(.*?)\*\*/g, '$1')
+                    .replace(/\*(.*?)\*/g, '$1')
+                    .replace(/__(.*?)__/g, '$1')
+                    .replace(/_(.*?)_/g, '$1')
+                    .replace(/[`*~#]/g, '')
+                    .trim();
             };
 
             lineas.forEach(linea => {
                 const limpia = linea.trim();
                 const titulo = limpia.match(/^#\s+Presentaci[oó]n\s*:\s*(.+)$/i);
                 if (titulo) {
-                    tituloPresentacion = titulo[1].trim();
+                    tituloPresentacion = limpiarTextoMarkdown(titulo[1]);
                     return;
                 }
                 const encabezado = limpia.match(/^##\s+(?:Diapositiva\s*\d+\s*[:.-]?\s*)?(.+)$/i);
                 if (encabezado) {
                     guardar();
-                    actual = { titulo: encabezado[1].trim(), puntos: [] };
+                    actual = { titulo: limpiarTextoMarkdown(encabezado[1]), puntos: [] };
                     return;
                 }
                 if (!actual) actual = { titulo: 'Ideas principales', puntos: [] };
-                const punto = limpia.replace(/^[-*•]\s+/, '').replace(/^\d+[.)]\s+/, '').trim();
-                if (punto && !/^\|?\s*[-:]+\s*\|?$/.test(punto) && !/^Diapositiva\s*\d+/i.test(punto)) {
-                    actual.puntos.push(punto.replace(/\*\*/g, ''));
-                }
+            const punto = limpia.replace(/^[-*•]\s+/, '').replace(/^\d+[.)]\s+/, '').trim();
+            if (punto && !/^\|?\s*[-:]+\s*\|?$/.test(punto) && !/^Diapositiva\s*\d+/i.test(punto)) {
+                // Si el punto viene con numeración o etiquetas artificiales tipo "1. ", "Punto 1:", limpiarlo a concepto real
+                const puntoLimpio = punto.replace(/^(?:Punto|Idea|Concepto|Aspecto|Elemento)?\s*\d+\s*[:.-]\s*/i, '');
+                actual.puntos.push(limpiarTextoMarkdown(puntoLimpio || punto));
+            }
             });
             guardar();
 
             if (!diapositivas.length) {
-                return { titulo: tituloPresentacion || 'Presentación', diapositivas: [{ titulo: 'Resumen', puntos: texto.split(/[.!?]\s+/).map(item => item.trim()).filter(Boolean).slice(0, 5) }] };
+                return { titulo: limpiarTextoMarkdown(tituloPresentacion || 'Presentación Académica'), diapositivas: [{ titulo: 'Resumen', puntos: texto.split(/[.!?]\s+/).map(item => limpiarTextoMarkdown(item)).filter(Boolean).slice(0, 5) }] };
             }
-            return { titulo: tituloPresentacion || diapositivas[0].titulo || 'Presentación', diapositivas };
-        }
-
-        function normalizarTexto(texto) {
-            return String(texto || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            return { titulo: limpiarTextoMarkdown(tituloPresentacion || diapositivas[0].titulo || 'Presentación Académica'), diapositivas };
         }
 
         function consultasDeDiapositiva(diapositiva, contexto = '') {
@@ -2335,101 +2868,232 @@
             ].filter(item => item.length >= 4))].slice(0, 3);
         }
 
-        async function buscarImagenEnInternet(diapositiva, contexto, usadas) {
-            for (const consulta of consultasDeDiapositiva(diapositiva, contexto)) {
-                const endpoint = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(consulta)}&gsrnamespace=6&gsrlimit=8&prop=imageinfo&iiprop=url|mime&iiurlwidth=900&format=json&origin=*`;
-                try {
-                    const respuesta = await fetch(endpoint);
-                    if (!respuesta.ok) continue;
-                    const datos = await respuesta.json();
-                    const paginas = Object.values(datos.query?.pages || {});
-                    const pagina = paginas.find(item => {
-                        const info = item.imageinfo?.[0];
-                        return info && /^image\//.test(info.mime || '') && !usadas.has(info.thumburl || info.url);
-                    });
-                    const imagen = pagina?.imageinfo?.[0]?.thumburl || pagina?.imageinfo?.[0]?.url;
-                    if (imagen) return imagen;
-                } catch (_) {
-                    continue;
-                }
-            }
-            return null;
-        }
-
         async function asignarImagenes(diapositivas, contexto = '') {
+            let imagenesUnsplash = [];
+            try {
+                const respuesta = await fetch('/api/presentacion/imagenes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: AbortSignal.timeout(30000),
+                    body: JSON.stringify({ slides: diapositivas.map(diapositiva => ({
+                        query: consultasDeDiapositiva(diapositiva, contexto)[0] || diapositiva.titulo
+                    })) })
+                });
+                if (respuesta.ok) imagenesUnsplash = (await respuesta.json()).images || [];
+            } catch (_) {}
+
             const usadas = new Set();
-            for (const diapositiva of diapositivas) {
-            const imagen = await buscarImagenEnInternet(diapositiva, contexto, usadas);
-                diapositiva.imagen = imagen && !usadas.has(imagen) ? imagen : null;
-                if (diapositiva.imagen) usadas.add(diapositiva.imagen);
+            for (const [indice, diapositiva] of diapositivas.entries()) {
+                const foto = imagenesUnsplash[indice];
+                if (foto?.url && !usadas.has(foto.id)) {
+                    diapositiva.imagen = foto.url;
+                    diapositiva.altImagen = foto.alt || diapositiva.titulo;
+                    diapositiva.creditoImagen = {
+                        texto: `Foto: ${foto.photographer} / Unsplash`,
+                        url: foto.photoUrl
+                    };
+                    usadas.add(foto.id);
+                } else {
+                    diapositiva.imagen = null;
+                    diapositiva.altImagen = diapositiva.titulo;
+                    diapositiva.creditoImagen = null;
+                }
             }
         }
 
         function dividirPunto(punto) {
             const partes = punto.split(/:\s*/, 2);
-            const titulo = partes[0].trim();
-            const detalle = (partes[1] || partes[0]).trim();
-            return { titulo: titulo || 'Punto clave', detalle };
+            let titulo = partes[0].trim();
+            let detalle = (partes[1] || '').trim();
+
+            // Si no hay dos puntos, o si el detalle quedó idéntico al título, no duplicar
+            if (!detalle || detalle === titulo) {
+                // Si es un texto largo explicativo sin dos puntos
+                if (titulo.length > 55) {
+                    detalle = titulo;
+                    // Extraer las primeras palabras como concepto orientativo
+                    const palabras = titulo.split(/\s+/);
+                    titulo = palabras.slice(0, 4).join(' ');
+                } else {
+                    detalle = titulo;
+                }
+            }
+            return { titulo: titulo || 'Concepto clave', detalle };
         }
 
-        function crearVisualDeDiapositiva(puntos, indice) {
+        function extraerDatosGrafico(diapositiva) {
+            const titulo = diapositiva.titulo || '';
+            const isChartTitle = /(gr[aá]fic|estad[ií]stic|indicador|m[eé]trica|datos cuantitativos|comparaci[oó]n|distribuci[oó]n|porcentaje|tendencia|evoluci[oó]n)/i.test(titulo);
+
+            const datos = [];
+            for (const punto of (diapositiva.puntos || [])) {
+                const coincidencia = String(punto).match(/^(.{1,50}?)\s*[:|-]\s*(-?\d+(?:[.,]\d+)?)\s*(%|por ciento|[a-zA-Z]{1,8})?\s*$/);
+                if (coincidencia) {
+                    const valor = Number(coincidencia[2].replace(',', '.'));
+                    if (Number.isFinite(valor)) {
+                        datos.push({ etiqueta: coincidencia[1].trim(), valor });
+                    }
+                }
+            }
+
+            if (datos.length >= 2 && (isChartTitle || datos.length >= diapositiva.puntos.length * 0.6)) {
+                return datos.slice(0, 8);
+            }
+            return null;
+        }
+
+        function esDiapositivaGrafico(diapositiva) {
+            return extraerDatosGrafico(diapositiva) !== null;
+        }
+
+        function crearGraficoHtml(diapositiva) {
+            const datos = extraerDatosGrafico(diapositiva);
+            if (!datos) {
+                return `<div class="slide-chart-note"><strong>No se pudo dibujar el gráfico.</strong> Esta diapositiva necesita al menos dos valores numéricos explícitos en el contenido, por ejemplo: <em>Ventas: 24</em>. Beto no inventa cifras.</div>`;
+            }
+            const maximo = Math.max(...datos.map(dato => Math.abs(dato.valor)), 1);
+            const anchoBarra = 560;
+            const alto = 76 + datos.length * 48;
+            const filas = datos.map((dato, indice) => {
+                const y = 46 + indice * 48;
+                const ancho = Math.max(4, Math.abs(dato.valor) / maximo * anchoBarra);
+                const color = indice % 3 === 1 ? '#f5822a' : indice % 3 === 2 ? '#20a89a' : '#2878d0';
+                return `<text x="8" y="${y + 19}" fill="#243b59" font-size="15" font-weight="600">${escaparHtml(dato.etiqueta.slice(0, 34))}</text>
+                    <rect x="210" y="${y}" width="${anchoBarra}" height="28" rx="7" fill="#edf2f8"></rect>
+                    <rect x="210" y="${y}" width="${ancho}" height="28" rx="7" fill="${color}"></rect>
+                    <text x="${Math.min(790, 222 + ancho)}" y="${y + 19}" fill="#18304d" font-size="14" font-weight="700">${escaparHtml(String(dato.valor))}</text>`;
+            }).join('');
+            return `<div class="slide-chart-card">
+                <p class="slide-chart-heading">Comparación de valores</p>
+                <svg viewBox="0 0 820 ${alto}" role="img" aria-label="${escaparHtml(diapositiva.titulo)}">
+                    ${filas}
+                </svg>
+            </div>`;
+        }
+
+        function obtenerIconoParaConcepto(titulo = '') {
+            const t = titulo.toLowerCase();
+            if (t.includes('materia') || t.includes('estrella') || t.includes('galax') || t.includes('cosmos') || t.includes('universo')) return '✨';
+            if (t.includes('agujero') || t.includes('negro') || t.includes('gravedad') || t.includes('espacio')) return '🪐';
+            if (t.includes('energ') || t.includes('fuerza') || t.includes('aceler')) return '⚡';
+            if (t.includes('evidencia') || t.includes('observ') || t.includes('investig') || t.includes('metod')) return '🔬';
+            if (t.includes('conclu') || t.includes('aprendiz') || t.includes('sintesis')) return '🎯';
+            if (t.includes('dato') || t.includes('cifra') || t.includes('porcent') || t.includes('analis') || t.includes('estad')) return '📊';
+            if (t.includes('tiempo') || t.includes('historia') || t.includes('evoluc')) return '⏳';
+            if (t.includes('persona') || t.includes('equipo') || t.includes('estudiant') || t.includes('rol') || t.includes('comunidad')) return '👥';
+            if (t.includes('ia') || t.includes('tecnolog') || t.includes('sistema') || t.includes('algoritmo') || t.includes('software')) return '💻';
+            if (t.includes('concepto') || t.includes('fundamento') || t.includes('teor') || t.includes('definici')) return '📚';
+            if (t.includes('objetivo') || t.includes('meta') || t.includes('alcance')) return '🎯';
+            if (t.includes('impacto') || t.includes('resultado') || t.includes('beneficio')) return '🚀';
+            if (t.includes('reto') || t.includes('desaf') || t.includes('problema')) return '⚠️';
+            return '📌';
+        }
+
+        function esDiapositivaTextoLargo(titulo, puntos) {
+            return /(introducci[oó]n|contexto|antecedentes|justificaci[oó]n|planteamiento|visi[oó]n general|panorama|marco)/i.test(titulo || '') || puntos.length === 1;
+        }
+
+        function esDiapositivaListaLimpia(titulo, puntos) {
+            return /(caracter[ií]stica|beneficio|ventaja|elemento|rol|factor|principio|componente|criterio)/i.test(titulo || '') || puntos.length >= 4;
+        }
+
+        function esDiapositivaLineaTiempo(titulo) {
+            return /(tiempo|cronolog|historia|fase|etapa|proceso|paso|evoluci[oó]n|secuencia|desarrollo)/i.test(titulo || '');
+        }
+
+        function esDiapositivaConceptosGrandes(titulo, puntos) {
+            return /(fundamento|concepto|definici[oó]n|teor[ií]a|esencia|qu[eé] es)/i.test(titulo || '') || puntos.length === 2;
+        }
+
+        function crearVisualDeDiapositiva(puntos, diapositiva, indice) {
             const elementos = puntos.map(dividirPunto);
-            const tipo = indice % 4;
+            if (!elementos.length) return '<p class="canva-card-desc">Contenido no disponible.</p>';
+            const titulo = diapositiva?.titulo || '';
 
-            if (tipo === 1) {
-                return `<div class="slide-card-grid">${elementos.slice(0, 6).map((elemento, posicion) => `
-                    <div class="slide-card-item">
-                        <span class="slide-card-number">${String(posicion + 1).padStart(2, '0')}</span>
-                        <strong>${escaparHtml(elemento.titulo)}</strong>
-                        <span>${escaparHtml(elemento.detalle)}</span>
-                    </div>`).join('')}</div>`;
+            // 1. FORMATO EDITORIAL / TEXTO LARGO (Sin cajas: para introducción, contexto y conceptos amplios)
+            if (esDiapositivaTextoLargo(titulo, puntos)) {
+                return `<div class="editorial-narrative-layout">
+                    ${elementos.map((item, idx) => `
+                        <div class="editorial-narrative-block">
+                            ${item.titulo && item.titulo !== item.detalle ? `<h3 class="editorial-narrative-subtitle">${escaparHtml(item.titulo)}</h3>` : ''}
+                            <p class="editorial-narrative-paragraph">${escaparHtml(item.detalle)}</p>
+                        </div>
+                    `).join('')}
+                </div>`;
             }
 
-            if (tipo === 2) {
-                return `<div class="slide-timeline">${elementos.slice(0, 6).map(elemento => `
-                    <div class="slide-timeline-item">
-                        <span class="slide-timeline-dot" aria-hidden="true"></span>
-                        <div><strong>${escaparHtml(elemento.titulo)}</strong><span>${escaparHtml(elemento.detalle)}</span></div>
-                    </div>`).join('')}</div>`;
+            // 2. FORMATO LISTA MINIMALISTA CON BULLETS DESTACADOS (Estilo corporativo sin recuadros pesados)
+            if (esDiapositivaListaLimpia(titulo, puntos) && (indice % 2 === 0)) {
+                return `<div class="editorial-list-layout">
+                    ${elementos.map((item, idx) => {
+                        const icon = obtenerIconoParaConcepto(item.titulo);
+                        return `<div class="editorial-list-item">
+                            <div class="editorial-bullet-circle">${icon}</div>
+                            <div class="editorial-list-content">
+                                <h4 class="editorial-list-heading">${escaparHtml(item.titulo)}</h4>
+                                <p class="editorial-list-text">${escaparHtml(item.detalle && item.detalle !== item.titulo ? item.detalle : item.titulo)}</p>
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>`;
             }
 
-            if (tipo === 3) {
-                return `<div class="slide-bars" aria-label="Gráfico visual de los temas de la diapositiva">${elementos.slice(0, 6).map((elemento, posicion) => {
-                    const ancho = 42 + ((elemento.detalle.length * 7 + posicion * 13) % 49);
-                    return `<div class="slide-bar-row"><strong title="${escaparHtml(elemento.titulo)}">${escaparHtml(elemento.titulo)}</strong><div class="slide-bar-track"><div class="slide-bar-fill" style="width:${ancho}%"></div></div></div>`;
-                }).join('')}</div>`;
+            // 3. FORMATO LÍNEA DE TIEMPO / PROCESO SECUENCIAL (Para historia, etapas o evolución)
+            if (esDiapositivaLineaTiempo(titulo) && elementos.length >= 2) {
+                return `<div class="canva-timeline">
+                    <div class="canva-timeline-track"></div>
+                    ${elementos.map((item, idx) => {
+                        const icon = obtenerIconoParaConcepto(item.titulo);
+                        return `<div class="canva-timeline-step">
+                            <div class="canva-timeline-badge">
+                                <span class="canva-timeline-num">${idx + 1}</span>
+                                <span class="canva-timeline-icon">${icon}</span>
+                            </div>
+                            <div class="canva-timeline-content">
+                                <h4 class="canva-timeline-title">${escaparHtml(item.titulo)}</h4>
+                                <p class="canva-timeline-desc">${escaparHtml(item.detalle)}</p>
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>`;
             }
 
-            return `<table class="slide-data-table"><thead><tr><th>Aspecto</th><th>Información</th></tr></thead><tbody>${elementos.slice(0, 6).map(elemento => `
-                <tr><td><strong>${escaparHtml(elemento.titulo)}</strong></td><td>${escaparHtml(elemento.detalle)}</td></tr>`).join('')}</tbody></table>`;
-        }
+            // 4. FORMATO HERO CONCEPTUAL / IMPACTO (Para conceptos clave o definiciones principales)
+            if (esDiapositivaConceptosGrandes(titulo, puntos) && elementos.length <= 3) {
+                return `<div class="canva-hero-concept-layout">
+                    ${elementos.map((item, idx) => {
+                        const icon = obtenerIconoParaConcepto(item.titulo);
+                        return `<div class="canva-hero-card">
+                            <div class="canva-hero-header">
+                                <span class="canva-hero-icon">${icon}</span>
+                                <h3 class="canva-hero-title">${escaparHtml(item.titulo)}</h3>
+                            </div>
+                            <p class="canva-hero-body">${escaparHtml(item.detalle)}</p>
+                        </div>`;
+                    }).join('')}
+                </div>`;
+            }
 
-        function fraseFilosofica(titulo) {
-            const tema = normalizarTexto(titulo);
-            if (/vida|humano|humanidad|sociedad/.test(tema)) return 'Humanismo: comprender la vida también es comprender nuestras relaciones y decisiones.';
-            if (/ciencia|conocimiento|educacion|aprendizaje/.test(tema)) return 'Epistemología: toda pregunta rigurosa transforma la manera en que entendemos el mundo.';
-            if (/historia|cultura|arte/.test(tema)) return 'Memoria y sentido: conocer el pasado permite interpretar el presente con una mirada más crítica.';
-            if (/tecnologia|inteligencia artificial|futuro/.test(tema)) return 'Praxis: una idea adquiere valor cuando se convierte en una acción responsable.';
-            if (/ambiente|naturaleza|clima/.test(tema)) return 'Interdependencia: ningún fenómeno existe aislado de su entorno y sus consecuencias.';
-            return 'Pensamiento crítico: comprender un tema es relacionar sus causas, sus efectos y sus posibilidades.';
-        }
+            // 5. FORMATO COLUMNAS DE CARACTERÍSTICAS / COMPARATIVO (Para cuando sí se requieren tarjetas)
+            const total = elementos.length;
+            const gridClass = total <= 2 ? 'canva-grid-2' : total === 3 ? 'canva-grid-3' : total === 4 ? 'canva-grid-4' : 'canva-grid-more';
 
-        function crearIlustracionSvg(indice, portada) {
-            const fondo = portada ? '#1c4966' : '#d9e2ec';
-            const primario = indice % 2 ? '#2f80ed' : '#f6bd60';
-            const secundario = indice % 2 ? '#f6bd60' : '#48cae4';
-            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Ilustración conceptual">
-                <circle cx="120" cy="120" r="108" fill="${fondo}"/>
-                <circle cx="178" cy="64" r="26" fill="${secundario}" opacity=".9"/>
-                <path d="M42 166 93 91l35 42 28-29 42 62H42Z" fill="${primario}"/>
-                <rect x="62" y="148" width="116" height="12" rx="6" fill="#fff" opacity=".9"/>
-                <rect x="62" y="174" width="78" height="12" rx="6" fill="#fff" opacity=".55"/>
-                <path d="M74 66h46" stroke="#fff" stroke-width="9" stroke-linecap="round" opacity=".85"/>
-            </svg>`;
-        }
+            return `<div class="canva-container ${gridClass}">
+                ${elementos.map((item, idx) => {
+                    const icon = obtenerIconoParaConcepto(item.titulo);
+                    const colorVariants = ['canva-accent-blue', 'canva-accent-amber', 'canva-accent-purple', 'canva-accent-emerald', 'canva-accent-rose'];
+                    const colorClass = colorVariants[idx % colorVariants.length];
 
-        function svgComoDataUri(svg) {
-            return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
+                    return `<article class="canva-card ${colorClass}">
+                        <div class="canva-card-top">
+                            <span class="canva-card-icon">${icon}</span>
+                            <span class="canva-card-tag">${escaparHtml(item.titulo.slice(0, 15))}</span>
+                        </div>
+                        <h3 class="canva-card-title">${escaparHtml(item.titulo)}</h3>
+                        <p class="canva-card-desc">${escaparHtml(item.detalle && item.detalle !== item.titulo ? item.detalle : item.titulo)}</p>
+                    </article>`;
+                }).join('')}
+            </div>`;
         }
 
         function cerrarVistaPresentacion() {
@@ -2437,19 +3101,54 @@
         }
 
         function crearHtmlDiapositiva(diapositiva, indice) {
+            const total = window.presentacionPendiente?.diapositivas?.length || 1;
             const portada = indice === 0;
-            const puntos = diapositiva.puntos.length ? diapositiva.puntos : [fraseFilosofica(diapositiva.titulo)];
+            const cierre = !portada && indice === total - 1 && total > 2;
+            const puntos = diapositiva.puntos.length ? diapositiva.puntos : ['Contenido no disponible.'];
             const imagen = diapositiva.imagen;
-            const contenido = portada
-                ? `<ul>${puntos.map(punto => `<li>${escaparHtml(punto)}</li>`).join('')}</ul>`
-                : crearVisualDeDiapositiva(puntos, indice);
-            return `<article class="presentacion-slide-html${portada ? ' portada' : ''}${imagen ? ' has-slide-image' : ''}">
-                <div class="slide-brand">UNIVERSIDAD ESTATAL DE MILAGRO <span>• ${portada ? 'PRESENTACIÓN' : 'BETO IA'}</span></div>
+
+            if (portada) {
+                const primerPunto = puntos[0] || 'Síntesis de los conceptos centrales, análisis crítico y conclusiones del tema propuesto.';
+                const agendaPuntos = (puntos.length > 1 ? puntos.slice(1, 5) : [
+                    'Contexto e Introducción',
+                    'Fundamentos y Evidencias',
+                    'Desarrollo y Casos de Estudio',
+                    'Conclusiones y Recomendaciones'
+                ]);
+                return `<article class="presentacion-slide-html portada${imagen ? ' has-slide-image' : ''}">
+                    <div class="portada-ribbon">UNIVERSIDAD ESTATAL DE MILAGRO &nbsp;•&nbsp; ASISTENCIA ACADÉMICA BETO IA</div>
+                    <div class="slide-kicker">PORTADA INSTITUCIONAL</div>
+                    <h2>${escaparHtml(diapositiva.titulo || 'Presentación Académica')}</h2>
+                    <div class="portada-hero-card">
+                        <p class="portada-lead-p">${escaparHtml(primerPunto)}</p>
+                        <div class="portada-agenda-grid">
+                            ${agendaPuntos.map((pt, i) => {
+                                const textoPunto = pt.replace(/^(?:Tema|Sección|Punto|Módulo)\s*\d+\s*[:.-]?\s*/i, '');
+                                const icono = obtenerIconoParaConcepto(textoPunto);
+                                return `
+                                <div class="portada-agenda-card">
+                                    <span class="portada-agenda-icon">${icono}</span>
+                                    <span class="portada-agenda-text">${escaparHtml(textoPunto)}</span>
+                                </div>
+                            `}).join('')}
+                        </div>
+                        <div class="portada-meta-strip">PRESENTACIÓN ACADÉMICA &nbsp; • &nbsp; UNEMI &nbsp; • &nbsp; ${total} DIAPOSITIVAS</div>
+                    </div>
+                    ${imagen ? `<img class="slide-foto" src="${escaparHtml(imagen)}" alt="${escaparHtml(diapositiva.altImagen || diapositiva.titulo)}" onerror="this.remove();">${diapositiva.creditoImagen ? `<a class="slide-photo-credit" href="${escaparHtml(diapositiva.creditoImagen.url)}" target="_blank" rel="noopener noreferrer">${escaparHtml(diapositiva.creditoImagen.texto)}</a>` : ''}` : ''}
+                    <div class="slide-footer">UNIVERSIDAD ESTATAL DE MILAGRO &nbsp; • &nbsp; BETO IA</div>
+                </article>`;
+            }
+
+            const contenido = esDiapositivaGrafico(diapositiva)
+                ? crearGraficoHtml(diapositiva)
+                : crearVisualDeDiapositiva(puntos, diapositiva, indice);
+            const claseTipo = cierre ? ' cierre' : ' contenido';
+            return `<article class="presentacion-slide-html${claseTipo}${imagen ? ' has-slide-image' : ''}">
                 <div class="slide-kicker">BETO IA &nbsp; / &nbsp; ${String(indice + 1).padStart(2, '0')}</div>
                 <h2>${escaparHtml(diapositiva.titulo || 'Presentación')}</h2>
                 <div class="slide-panel visual-panel">${contenido}</div>
-                ${imagen ? `<img class="slide-foto" src="${imagen}" alt="Imagen relacionada con ${escaparHtml(diapositiva.titulo || 'el tema')}" onerror="this.remove();">` : ''}
-                <div class="slide-footer">ASISTENTE ACADÉMICO BETO &nbsp; • &nbsp; UNEMI <span style="margin-left:18px">${String(indice + 1).padStart(2, '0')}</span></div>
+                ${imagen ? `<img class="slide-foto" src="${escaparHtml(imagen)}" alt="${escaparHtml(diapositiva.altImagen || `Imagen relacionada con ${diapositiva.titulo || 'el tema'}`)}" onerror="this.remove();">${diapositiva.creditoImagen ? `<a class="slide-photo-credit" href="${escaparHtml(diapositiva.creditoImagen.url)}" target="_blank" rel="noopener noreferrer">${escaparHtml(diapositiva.creditoImagen.texto)}</a>` : ''}` : ''}
+                <div class="slide-footer">UNIVERSIDAD ESTATAL DE MILAGRO &nbsp; • &nbsp; BETO IA <span style="margin-left:18px">${String(indice + 1).padStart(2, '0')}</span></div>
             </article>`;
         }
 
@@ -2464,7 +3163,7 @@
             if (portada) {
                 if (/^(ideas principales|resumen)$/i.test(portada.titulo)) portada.titulo = tituloPresentacion;
                 if (portada.puntos.length < 4) {
-                    const agenda = diapositivas.slice(1, 5).map((diapositiva, indice) => `Tema ${indice + 1}: ${diapositiva.titulo}`);
+                    const agenda = diapositivas.slice(1, 5).map((diapositiva) => diapositiva.titulo);
                     portada.puntos = [...new Set([...portada.puntos, ...agenda])].slice(0, 5);
                 }
             }
@@ -2478,11 +3177,91 @@
                 <div class="presentacion-toolbar-actions">
                     <button type="button" class="presentacion-back-button" onclick="cerrarVistaPresentacion()">← Volver al chat</button>
                     <button type="button" onclick="window.location.assign('/')">Inicio de Beto</button>
+                    <span>Web completa</span>
+                    <button type="button" onclick="copiarCodigoPresentacion('html', this)">Copiar HTML</button>
+                    <button type="button" onclick="copiarCodigoPresentacion('css', this)">Copiar CSS</button>
+                    <button type="button" onclick="descargarCodigoPresentacion('html')">Descargar HTML</button>
+                    <button type="button" onclick="descargarCodigoPresentacion('css')">Descargar CSS</button>
                     <button type="button" onclick="descargarPresentacionPDF()">Descargar PDF visual</button>
-                    <button type="button" onclick="descargarPresentacion()">Descargar PowerPoint</button>
+                    <select id="plantilla-presentacion" aria-label="Plantilla de PowerPoint">
+                        <option value="academico">Académico</option>
+                        <option value="tecnologico">Tecnológico</option>
+                        <option value="empresarial">Empresarial</option>
+                        <option value="minimalista">Minimalista</option>
+                        <option value="educativo">Educativo</option>
+                        <option value="cientifico">Científico</option>
+                        <option value="creativo">Creativo</option>
+                    </select>
+                    <label class="pptx-images-option"><input id="incluir-imagenes-pptx" type="checkbox" checked> Imágenes disponibles</label>
+                    <button type="button" class="btn-descargar-pptx" onclick="descargarPresentacion()">Generar y descargar PPTX</button>
                 </div>
             </div><main class="presentacion-slides">${diapositivas.map(crearHtmlDiapositiva).join('')}</main>`;
             document.body.appendChild(overlay);
+        };
+
+        function obtenerCssExportable() {
+            const clasesExportadas = new Set();
+            const diapositivas = document.createElement('div');
+            diapositivas.innerHTML = window.presentacionPendiente?.diapositivas
+                .map(crearHtmlDiapositiva).join('') || '';
+            for (const elemento of diapositivas.querySelectorAll('[class]')) {
+                for (const clase of elemento.classList) clasesExportadas.add(clase);
+            }
+            const selectorRelevante = /presentacion-slide-html|presentacion-export|slide-|portada-|:root|(^|[\s,>+~])(?:\*|html|body|h[1-6]|p|ul|ol|li|table|thead|tbody|tr|th|td|strong|em|a|img|main|article|section)(?=$|[\s.#:[>+~])/;
+            const esSelectorExportable = selector => selectorRelevante.test(selector) ||
+                Array.from(selector.matchAll(/\.([_a-zA-Z][\w-]*)/g)).some(([, clase]) => clasesExportadas.has(clase));
+            const extraerReglas = reglas => Array.from(reglas).flatMap(regla => {
+                if (regla.selectorText) {
+                    return esSelectorExportable(regla.selectorText) ? [regla.cssText] : [];
+                }
+                if (regla.cssRules) {
+                    const interiores = extraerReglas(regla.cssRules);
+                    const encabezado = regla.cssText.slice(0, regla.cssText.indexOf('{')).trim();
+                    return interiores.length ? [`${encabezado} {\n${interiores.join('\n')}\n}`] : [];
+                }
+                return [];
+            });
+            const reglas = [];
+            for (const hoja of document.styleSheets) {
+                try {
+                    reglas.push(...extraerReglas(hoja.cssRules));
+                } catch (_) {}
+            }
+            const fondosCss = window.FONDOS_PRESENTACION_UNEMI
+                ? `:root {\n  --bg-portada: url('${window.FONDOS_PRESENTACION_UNEMI.portadaData}');\n  --bg-contenido: url('${window.FONDOS_PRESENTACION_UNEMI.contenidoData}');\n  --bg-cierre: url('${window.FONDOS_PRESENTACION_UNEMI.cierreData}');\n}`
+                : `:root {\n  --bg-portada: url('/img/fondos_presentacion/fondo_portada.jpg');\n  --bg-contenido: url('/img/fondos_presentacion/fondo_contenido.jpg');\n  --bg-cierre: url('/img/fondos_presentacion/fondo_cierre.jpg');\n}`;
+            return `@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap');\n\n${fondosCss}\n\n* { box-sizing: border-box; }\nbody { margin: 0; background: #f1f5f9; color: #1d2c44; font-family: Poppins, sans-serif; }\n.presentacion-export { display: grid; gap: 24px; width: min(1180px, calc(100% - 32px)); margin: 24px auto; }\n${reglas.join('\n')}`;
+        }
+
+        function obtenerHtmlExportable() {
+            const pendiente = window.presentacionPendiente;
+            if (!pendiente) return '';
+            return `<!doctype html>\n<html lang="es">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${escaparHtml(pendiente.titulo)}</title>\n<link rel="stylesheet" href="presentacion.css">\n</head>\n<body>\n<main class="presentacion-export">\n${pendiente.diapositivas.map(crearHtmlDiapositiva).join('\n')}\n</main>\n</body>\n</html>`;
+        }
+
+        window.copiarCodigoPresentacion = async function(tipo, boton) {
+            const contenido = tipo === 'css' ? obtenerCssExportable() : obtenerHtmlExportable();
+            const etiquetaOriginal = boton.textContent;
+            try {
+                await navigator.clipboard.writeText(contenido);
+            } catch (_) {
+                const area = document.createElement('textarea');
+                area.value = contenido;
+                area.style.position = 'fixed';
+                area.style.opacity = '0';
+                document.body.appendChild(area);
+                area.select();
+                document.execCommand('copy');
+                area.remove();
+            }
+            boton.textContent = 'Copiado';
+            window.setTimeout(() => { boton.textContent = etiquetaOriginal; }, 1800);
+        };
+
+        window.descargarCodigoPresentacion = function(tipo) {
+            const extension = tipo === 'css' ? 'css' : 'html';
+            const contenido = extension === 'css' ? obtenerCssExportable() : obtenerHtmlExportable();
+            descargarBlob(new Blob([contenido], { type: `text/${extension};charset=utf-8` }), `presentacion.${extension}`);
         };
 
         window.descargarPresentacionPDF = async function() {
@@ -2510,102 +3289,62 @@
         };
 
         window.descargarPresentacion = async function() {
-            const PptxGenJS = window.PptxGenJS || window.pptxgen;
             const pendiente = window.presentacionPendiente;
-            if (!PptxGenJS || !pendiente) {
-                alert('El exportador de PowerPoint se está cargando, por favor intenta en unos segundos.');
+            if (!pendiente) {
+                alert('No hay una presentación para exportar.');
                 return;
             }
-            const pptx = new PptxGenJS();
-            pptx.layout = 'LAYOUT_WIDE';
-            pptx.author = 'Beto IA';
-            pptx.subject = 'Presentación académica';
-            pptx.title = pendiente.titulo;
-            pptx.company = 'UNEMI';
-            pptx.lang = 'es-ES';
-            pptx.theme = { headFontFace: 'Montserrat', bodyFontFace: 'Poppins', lang: 'es-ES' };
-            const obtenerImagenComoDataUri = async (url) => {
-                try {
-                    const respuesta = await fetch(url, { mode: 'cors' });
-                    if (!respuesta.ok) throw new Error('No se pudo descargar la imagen.');
-                    const bytes = new Uint8Array(await respuesta.arrayBuffer());
-                    let binario = '';
-                    bytes.forEach(byte => binario += String.fromCharCode(byte));
-                    return `data:${respuesta.headers.get('Content-Type') || 'image/jpeg'};base64,${btoa(binario)}`;
-                } catch (_) {
-                    return null;
-                }
-            };
-            for (const [indice, diapositiva] of pendiente.diapositivas.entries()) {
-                const portada = indice === 0;
-                const slide = pptx.addSlide();
-                slide.background = { color: 'F7F9FE' };
-                const segmentos = [
-                    { x: 0, w: 3.6, color: '0A2345' },
-                    { x: 3.6, w: 3, color: '3C8DFF' },
-                    { x: 6.6, w: 2.75, color: 'F5822A' },
-                    { x: 9.35, w: 3.15, color: 'FF7BBF' }
-                ];
-                segmentos.forEach(segmento => slide.addShape(pptx.ShapeType.rect, { x: segmento.x, y: 0, w: segmento.w, h: 0.12, line: { color: segmento.color, transparency: 100 }, fill: { color: segmento.color } }));
-                slide.addText(`UNIVERSIDAD ESTATAL DE MILAGRO  •  ${portada ? 'PRESENTACIÓN' : 'BETO IA'}`, { x: 0.7, y: 0.38, w: 7, h: 0.25, fontFace: 'Poppins', fontSize: 10, bold: true, color: '0A5CB3', charSpacing: 0.7, margin: 0 });
-                slide.addText(`BETO IA  /  ${String(indice + 1).padStart(2, '0')}`, { x: 0.7, y: 0.76, w: 4.8, h: 0.25, fontFace: 'Poppins', fontSize: 9, bold: true, color: 'F5822A', charSpacing: 1.2, margin: 0 });
-                slide.addText(diapositiva.titulo || 'Presentación', { x: 0.7, y: 1.12, w: portada ? 5.8 : 10.9, h: 1.05, fontFace: 'Montserrat', fontSize: portada ? 32 : 28, bold: true, color: '0A2345', margin: 0, fit: 'shrink' });
-                const puntos = diapositiva.puntos.length ? diapositiva.puntos : [fraseFilosofica(diapositiva.titulo)];
-                slide.addShape(pptx.ShapeType.rect, { x: 0.7, y: portada ? 2.35 : 2.28, w: portada ? 6 : 11.2, h: portada ? 3.45 : 3.65, line: { color: 'DCE8F5', width: 1 }, fill: { color: 'FFFFFF', transparency: 3 } });
-                slide.addShape(pptx.ShapeType.rect, { x: 0.7, y: portada ? 2.35 : 2.28, w: portada ? 6 : 11.2, h: 0.08, line: { color: '3C8DFF', transparency: 100 }, fill: { color: '3C8DFF' } });
-                if (portada) {
-                    slide.addText(puntos.map(punto => ({ text: punto, options: { bullet: { indent: 16 }, hanging: 4 } })), { x: 0.98, y: 2.65, w: 5.35, h: 2.85, fontFace: 'Poppins', fontSize: 17, color: '1D2C44', breakLine: true, valign: 'mid', paraSpaceAfterPt: 13, margin: 0.08, fit: 'shrink' });
-                } else if (indice % 4 === 1) {
-                    puntos.slice(0, 6).forEach((punto, posicion) => {
-                        const columna = posicion % 3;
-                        const fila = Math.floor(posicion / 3);
-                        const partes = punto.split(/:\s*/, 2);
-                        const tituloPunto = partes[0].trim() || 'Punto clave';
-                        const detallePunto = (partes[1] || partes[0]).trim();
-                        const x = 0.98 + columna * 3.48;
-                        const y = 2.68 + fila * 1.42;
-                        slide.addShape(pptx.ShapeType.rect, { x, y, w: 3.15, h: 1.12, line: { color: 'DCE8F5', width: 1 }, fill: { color: fila % 2 ? 'F4F9FF' : 'FFFFFF' } });
-                        slide.addText(String(posicion + 1).padStart(2, '0'), { x: x + 0.14, y: y + 0.12, w: 0.45, h: 0.2, fontFace: 'Montserrat', fontSize: 14, bold: true, color: 'F5822A', margin: 0 });
-                        slide.addText(tituloPunto, { x: x + 0.65, y: y + 0.12, w: 2.3, h: 0.25, fontFace: 'Montserrat', fontSize: 11, bold: true, color: '0A2345', fit: 'shrink', margin: 0 });
-                        slide.addText(detallePunto, { x: x + 0.14, y: y + 0.46, w: 2.8, h: 0.5, fontFace: 'Poppins', fontSize: 9, color: '5D728D', fit: 'shrink', margin: 0 });
-                    });
-                } else if (indice % 4 === 2) {
-                    puntos.slice(0, 6).forEach((punto, posicion) => {
-                        const partes = punto.split(/:\s*/, 2);
-                        const tituloPunto = partes[0].trim() || 'Punto clave';
-                        const detallePunto = (partes[1] || partes[0]).trim();
-                        const y = 2.68 + posicion * 0.52;
-                        if (posicion < puntos.length - 1) slide.addShape(pptx.ShapeType.line, { x: 1.08, y: y + 0.15, w: 0, h: 0.52, line: { color: 'B8D7F7', width: 1.5 } });
-                        slide.addShape(pptx.ShapeType.ellipse, { x: 0.98, y, w: 0.2, h: 0.2, line: { color: posicion % 2 ? 'F5822A' : '3C8DFF', width: 2 }, fill: { color: 'FFFFFF' } });
-                        slide.addText(tituloPunto, { x: 1.42, y: y - 0.02, w: 2.3, h: 0.18, fontFace: 'Montserrat', fontSize: 10, bold: true, color: '0A2345', margin: 0 });
-                        slide.addText(detallePunto, { x: 3.75, y: y - 0.02, w: 7.3, h: 0.22, fontFace: 'Poppins', fontSize: 9, color: '5D728D', fit: 'shrink', margin: 0 });
-                    });
-                } else if (indice % 4 === 3) {
-                    puntos.slice(0, 6).forEach((punto, posicion) => {
-                        const partes = punto.split(/:\s*/, 2);
-                        const tituloPunto = partes[0].trim() || 'Punto clave';
-                        const ancho = 3.7 + ((punto.length * 7 + posicion * 13) % 5.2);
-                        const y = 2.72 + posicion * 0.48;
-                        slide.addText(tituloPunto, { x: 0.98, y, w: 2.1, h: 0.18, fontFace: 'Poppins', fontSize: 10, bold: true, color: '0A2345', fit: 'shrink', margin: 0 });
-                        slide.addShape(pptx.ShapeType.rect, { x: 3.25, y: y + 0.03, w: 7.5, h: 0.13, line: { color: 'E5EEF8', transparency: 100 }, fill: { color: 'E5EEF8' } });
-                        slide.addShape(pptx.ShapeType.rect, { x: 3.25, y: y + 0.03, w: ancho, h: 0.13, line: { color: '7B61FF', transparency: 100 }, fill: { color: '7B61FF' } });
-                    });
-                } else {
-                    const filas = [['Aspecto', 'Información'], ...puntos.slice(0, 5).map(punto => {
-                        const partes = punto.split(/:\s*/, 2);
-                        return [partes[0].trim() || 'Punto clave', (partes[1] || partes[0]).trim()];
-                    })];
-                    slide.addTable(filas, { x: 0.98, y: 2.58, w: 10.55, h: 2.9, border: { type: 'solid', color: 'DCE8F5', pt: 1 }, fill: 'FFFFFF', color: '334E68', fontFace: 'Poppins', fontSize: 10, margin: 0.08, rowH: 0.42, bold: false, autoFit: false, colW: [2.35, 8.2], fit: 'shrink' });
-                }
-                if (portada && diapositiva.imagen) {
-                    const imagen = await obtenerImagenComoDataUri(diapositiva.imagen);
-                    if (imagen) slide.addImage({ data: imagen, x: 8.15, y: 1.78, w: 3.85, h: 3.75 });
-                }
-                slide.addShape(pptx.ShapeType.line, { x: 0.7, y: 6.82, w: 11.9, h: 0, line: { color: 'CBD5E1', width: 1 } });
-                slide.addText('Asistente académico Beto  •  UNEMI', { x: 0.7, y: 6.98, w: 5, h: 0.2, fontFace: 'Poppins', fontSize: 9, color: '7D8CA0', margin: 0 });
-                slide.addText(String(indice + 1).padStart(2, '0'), { x: 11.35, y: 6.98, w: 0.6, h: 0.2, fontFace: 'Poppins', fontSize: 9, bold: true, color: '7D8CA0', align: 'right', margin: 0 });
+
+            const boton = Array.from(document.querySelectorAll('.presentacion-toolbar button'))
+                .find(elemento => elemento.classList.contains('btn-descargar-pptx'));
+            if (boton) {
+                boton.disabled = true;
+                boton.textContent = 'Generando en el servidor...';
             }
-            await pptx.writeFile({ fileName: `${pendiente.titulo.replace(/\s+/g, '_')}.pptx` });
+
+            try {
+                const respuesta = await fetch('/api/presentacion/generar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: AbortSignal.timeout(120000),
+                    body: JSON.stringify({
+                        title: pendiente.titulo,
+                        template: document.getElementById('plantilla-presentacion')?.value || 'academico',
+                        includeImages: document.getElementById('incluir-imagenes-pptx')?.checked === true,
+                        slides: pendiente.diapositivas.map(slide => ({
+                            title: slide.titulo,
+                            points: slide.puntos,
+                            imageUrl: slide.imagen || '',
+                            imageCredit: slide.creditoImagen?.texto || ''
+                        }))
+                    })
+                });
+                if (!respuesta.ok) {
+                    const resultado = await respuesta.json().catch(() => ({}));
+                    throw new Error(resultado.error || 'No se pudo generar el archivo PowerPoint.');
+                }
+                const archivo = await respuesta.blob();
+                const url = URL.createObjectURL(archivo);
+                const enlace = document.createElement('a');
+                enlace.href = url;
+                enlace.download = `${(pendiente.titulo || 'Presentacion_Beto').replace(/[^\p{L}\p{N}_-]+/gu, '_')}.pptx`;
+                document.body.appendChild(enlace);
+                enlace.click();
+                enlace.remove();
+                window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+                const imagenesOmitidas = Number(respuesta.headers.get('X-Beto-Images-Skipped') || 0);
+                if (imagenesOmitidas) {
+                    alert(`El PowerPoint se descargó, pero se omitieron ${imagenesOmitidas} imágenes no disponibles.`);
+                }
+            } catch (error) {
+                console.error('Error al exportar la presentación a PowerPoint:', error);
+                alert(error.message || 'No se pudo generar el PowerPoint. Inténtalo de nuevo.');
+            } finally {
+                if (boton) {
+                    boton.disabled = false;
+                    boton.textContent = 'Generar y descargar PPTX';
+                }
+            }
         };
 
         window.exportarPowerPoint = window.abrirVistaPresentacion;
@@ -2883,7 +3622,7 @@
                 ? '\n\nEl resultado debe ser un informe largo, completo y bien desarrollado, no un resumen de pocas líneas. Desarrolla cada tema con contexto, argumentos, resultado y evidencia encontrada en la transcripción. Mantén un nivel profesional y listo para entregar o compartir. Además del resumen, incluye una sección "## Mejoras y recomendaciones" con propuestas concretas para mejorar procesos, comunicación, coordinación, tiempos, calidad y resultados. Para cada propuesta usa una tabla con: Mejora sugerida | Problema que resuelve | Beneficio esperado | Prioridad | Esfuerzo estimado | Primer paso. Distingue las recomendaciones que se desprenden de la reunión de las ideas nuevas que propones. Añade una sección "## Plan de seguimiento" con acciones para 24 horas, 7 días y 30 días, y una sección "## Indicadores sugeridos" con métricas para comprobar si las mejoras funcionan. No presentes una sugerencia como una decisión tomada. Incluye todos los puntos relevantes aunque la respuesta sea extensa; evita repetir frases vacías y prioriza información útil.\n'
                 : '';
             const instruccionesPresentacion = solicitaPresentacion || esResumenDeReunion
-                ? '\n\nFORMATO DE PRESENTACION: además del contenido principal, prepara una versión completa y lista para exportar a PowerPoint. Usa exactamente un encabezado "# Presentación: [título]" y después entre 8 y 10 bloques con encabezados "## Diapositiva 1: [título]", "## Diapositiva 2: [título]", etc. Desarrolla el tema con profundidad académica: contexto, definición de conceptos, antecedentes, causas o proceso, ejemplos concretos, aplicaciones, comparación de perspectivas, evidencias disponibles, limitaciones, riesgos, recomendaciones accionables y conclusión. En cada diapositiva incluye de 4 a 7 viñetas claras; cada viñeta debe ser una o dos frases completas y aportar información específica. Distribuye el contenido para que no se repita: incluye contexto, conceptos, desarrollo, caso o ejemplo, análisis, aplicaciones, riesgos, recomendaciones y cierre. No pongas tablas dentro de las diapositivas, no uses frases vacías y no inventes datos; si falta información escribe "No especificado".\n'
+                ? `\n\nFORMATO DE PRESENTACION — REGLAS DE DISEÑO PROFESIONAL:\nUsa exactamente un encabezado "# Presentación: [título académico]" y crea bloques "## Diapositiva N: [Título descriptivo real]".\n\nPLANIFICA visualmente cada diapositiva con una estructura diferente:\n- DIAPOSITIVA DE INTRODUCCIÓN/CONTEXTO: Un solo concepto extenso o un párrafo editorial narrativo. Usa "- Concepto: párrafo explicativo largo y fluido" SIN partir el contenido en 3 tarjetas paralelas.\n- DIAPOSITIVA DE PROCESO/ETAPAS: Usa "- Paso 1: descripción", "- Paso 2: descripción" (mínimo 3 pasos secuenciales).\n- DIAPOSITIVA DE COMPARACIÓN: Usa tabla Markdown "| Aspecto | Opción A | Opción B |".\n- DIAPOSITIVA DE DATOS: Título "Gráfico: [Tema]" con viñetas "- Categoría: Número".\n- DIAPOSITIVA DE CARACTERÍSTICAS: Lista de 3-4 puntos con formato "- Término: explicación breve".\n- NO uses la misma estructura en más de 2 diapositivas consecutivas.\n- NO pongas siempre exactamente 3 puntos por diapositiva — varía entre 1 párrafo largo, 2-3 comparaciones o 4-5 elementos de lista según el caso.\n- Títulos ESPECÍFICOS al contenido real. PROHIBIDO: "Concepto general", "Idea clave 1", "Punto importante".\n- No inventes datos, referencias ni fuentes.\n`
                 : '';
 
             // Ocultar chips de sugerencias tras la primera interacción
@@ -2900,13 +3639,13 @@
             animarBeto('hablando');
 
             try {
-                const respuesta = await fetch('/api/chat', {
+                const respuesta = await fetch(solicitaPresentacion ? '/api/presentacion' : '/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     signal: controladorSolicitud.signal,
-                    body: JSON.stringify({
-                        messages: [{ role: 'user', content: textoParaEnviar + instruccionesMejora + instruccionesPresentacion }]
-                    })
+                    body: JSON.stringify(solicitaPresentacion
+                        ? { prompt: textoParaEnviar + instruccionesMejora + instruccionesPresentacion }
+                        : { messages: [{ role: 'user', content: textoParaEnviar + instruccionesMejora + instruccionesPresentacion }] })
                 });
 
                 removerCargando();

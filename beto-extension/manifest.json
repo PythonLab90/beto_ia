@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Beto IA para todos los sitios",
-  "version": "1.7.5",
+  "version": "1.7.6",
   "description": "Asistente Beto IA para chat, documentos, videos y presentaciones en cualquier sitio web.",
   "content_scripts": [
     {
@@ -21,6 +21,10 @@
   "host_permissions": [
     "https://*.unemi.edu.ec/*",
     "http://*.unemi.edu.ec/*",
+    "http://localhost:3000/*",
+    "http://127.0.0.1:3000/*",
+    "http://127.0.0.1:8000/*",
+    "http://localhost:8000/*",
     "https://beto-ia-6.onrender.com/*"
   ],
   "action": {

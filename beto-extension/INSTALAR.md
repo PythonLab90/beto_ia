@@ -23,16 +23,6 @@ Aparecerá el botón azul `B` abajo a la derecha. Haz clic para abrir el asisten
 
 Los avisos solo se programan cuando Moodle muestra una tarea pendiente y una fecha de entrega reconocible. Se guardan en este navegador; no usan WhatsApp, números telefónicos ni un servicio de pago. Chrome debe estar abierto para que aparezcan.
 
-## Registrar un correo para avisos
-
-1. Abre Beto y pulsa **Correo** en el encabezado.
-2. Escribe tu dirección, acepta recibir recordatorios y pulsa **Enviar confirmación**.
-3. Abre el mensaje de Beto y confirma la dirección desde el enlace. El enlace vence en 24 horas.
-
-Beto no lee tu bandeja ni obtiene el correo desde Moodle. El registro queda pendiente hasta que se confirma. En local puede usarse SMTP. Render Free bloquea los puertos SMTP habituales; allí configura `EMAIL_PROVIDER=brevo`, una clave API de Brevo como secreto y un remitente verificado en ese servicio. No subas credenciales a Git.
-
-El servidor Node guarda los registros en `EMAIL_REMINDERS_FILE`. En producción debe apuntar a almacenamiento persistente; el disco temporal de un servicio gratuito puede perderlos al reiniciarse. Esta función registra y confirma el correo; el envío automático de recordatorios de tareas por email requiere además programar el envío de vencimientos.
-
 ## Crear una presentación
 
 Abre Beto desde Moodle y solicita una presentación indicando el tema. Beto puede generar las diapositivas, buscar imágenes en Internet relacionadas con cada tema, mostrar la vista previa y exportar la presentación a PDF o PowerPoint.
@@ -50,6 +40,6 @@ La contraseña nunca se envía a Beto. El video debe aparecer como un elemento d
 
 ## Importante
 
-La extensión utiliza el servidor público de Render en `https://beto-ia-6.onrender.com/`. El servicio gratuito puede tardar unos segundos en despertar después de un periodo sin uso.
+Para probar los cambios locales en PowerShell, inicia el servidor de Beto desde la carpeta del proyecto con `npm.cmd start`. La extensión se conecta a `http://localhost:3000/`, igual que la versión local de `pagina.html`. Mantén el servidor abierto durante las pruebas y recarga Moodle después de actualizar la extensión.
 
 Para que todos los estudiantes vean Beto sin instalar la extensión, hace falta agregar la integración en Moodle mediante un bloque HTML, el tema o un plugin con permisos administrativos.

@@ -8,3 +8,6 @@ node_modules/
 .vscode/
 beto_email_reminders.sqlite3*
 beto_email_reminders.json*
+.beto_tokens.json*
+.beto_browser_state*
+.beto_tasks.json*
